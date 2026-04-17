@@ -103,7 +103,7 @@ Notation for data "structure,CPF,LUM": "xxx/ooo"
 | 28 | A | [Chiral TTM Radical](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.202000098) |
 | 29 | A | [TTMCz kuehne](https://chemrxiv.org/doi/full/10.26434/chemrxiv.10001626/v1) |
 | 30 | A | [radical anion NDI](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.9b02269) |
-| 31 | oxx | Data needs to be scaled by 1e-4 | [biphenyl](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/adfm.201800051) |
+| 31 | xxx | Data needs to be scaled by 1e-4 [TADF mol](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/adfm.201800051) |
 | 32 | A | [Cyclophane](https://pubs.acs.org/doi/full/10.1021/acs.orglett.8b02995) |
 | 33 | A | [molecular assembly cpf](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.1c02013) |
 | 34 | A | [3PhC](https://pubs.rsc.org/en/content/articlelanding/2015/tc/c4tc02339k) |
@@ -122,8 +122,8 @@ Notation for data "structure,CPF,LUM": "xxx/ooo"
 | 48 | A | [mol 1](https://pubs.acs.org/doi/10.1021/acs.orglett.6b00747) |
 | 49 | A | [mol 4](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201801414) |
 | 50 | A | ox |
-| 51–53 | A | [mol 1–3](https://pubs.rsc.org/en/content/articlelanding/2015/ra/c4ra11488d) |
-| 52 |x  | get spectra 
+| 51 | xxx | [mol 1–3](https://pubs.rsc.org/en/content/articlelanding/2015/ra/c4ra11488d) |
+| 52 |xxx  | - |
 | 53 | xxx | -|
 | 54 | xxx | [naphtol bis pyrene](https://www.mdpi.com/1420-3049/23/10/2606) scale w 1e-3 |
 | 55 | xxx | scale w 1e-3 | 
