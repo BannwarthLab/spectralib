@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from cpl50.geometry import read_xyz
+from cpl50.io import read_xyz
 
 
 def test_read_all_structure_files():

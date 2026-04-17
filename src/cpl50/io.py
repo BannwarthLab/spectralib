@@ -34,7 +34,7 @@ def read_spectrum(path: str) -> Spectrum:
 
     hdict = dict(zip(REQUIRED_FIELDS, parts))
     hdict["file"] = path
-    print(hdict.keys)
+    
 
     # Check validity of entries
     _validate_header(hdict)
