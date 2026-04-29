@@ -104,24 +104,25 @@ Notation for data "structure,CPF,LUM": "xxx/ooo"
 | 29 | A | [TTMCz kuehne](https://chemrxiv.org/doi/full/10.26434/chemrxiv.10001626/v1) |
 | 30 | A | [radical anion NDI](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.9b02269) |
 | 31 | xxx | Data needs to be scaled by 1e-4 [TADF mol](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/adfm.201800051) |
-| 32 | A | [Cyclophane](https://pubs.acs.org/doi/full/10.1021/acs.orglett.8b02995) |
-| 33 | A | [molecular assembly cpf](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.1c02013) |
-| 34 | A | [3PhC](https://pubs.rsc.org/en/content/articlelanding/2015/tc/c4tc02339k) |
-| 35 | A | [Fig. 4 spec](https://www.pnas.org/doi/epdf/10.1073/pnas.1717524114) |
-| 36,37 | A | [mol 1,2](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201702143) |
-| 38 | A | [mol 1](https://pubs.acs.org/doi/full/10.1021/acs.orglett.7b02337) |
-| 39 | A | [mol 30](https://pubs.rsc.org/en/content/articlehtml/2012/nm/d3cc04187e) |
-| 40 | A | [Mol 1](https://pubs.rsc.org/en/content/articlehtml/2015/cc/c5cc03054d) |
-| 41 | A | [mol 2](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201600891) |
-| 42 | A | [Mol C3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201402930) |
-| 43 | A | [mol 5](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/ejoc.201501181) |
-| 44 | A | [mol 9](https://pubs.acs.org/doi/full/10.1021/jacs.7b05671) |
-| 45 | A | [mol 1 protonated](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201603591) |
-| 46 | A | [mol 1c](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201604398) |
-| 47 | A | [mol 1c](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b01087) |
-| 48 | A | [mol 1](https://pubs.acs.org/doi/10.1021/acs.orglett.6b00747) |
-| 49 | A | [mol 4](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201801414) |
-| 50 | A | ox |
+| 32 | xxx | Scale cpl 1e-3 [Cyclophane](https://pubs.acs.org/doi/full/10.1021/acs.orglett.8b02995) |
+| 33 | xxx | [molecular assembly cpf](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.1c02013) |
+| 34 | xxx | [3PhC](https://pubs.rsc.org/en/content/articlelanding/2015/tc/c4tc02339k) |
+| 35 | xxo | No Lum given! [Fig. 4 spec](https://www.pnas.org/doi/epdf/10.1073/pnas.1717524114) |
+| 36 | xxx | [(R)-1](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201702143) |
+| 37 | xxx | (R,R,R)-2 |
+| 38 | xxx | [mol 1](https://pubs.acs.org/doi/full/10.1021/acs.orglett.7b02337) |
+| 39 | xxx | [mol 30](https://pubs.rsc.org/en/content/articlehtml/2012/nm/d3cc04187e) aka [(+)-(12,4)BBBB-[4]CAn2,6](https://onlinelibrary.wiley.com/doi/full/10.1002/ange.201909401)|
+| 40 | A | Too fluxional, discarded [Mol 1](https://pubs.rsc.org/en/content/articlehtml/2015/cc/c5cc03054d) |
+| 41 | excluded | [mol 2](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201600891) |
+| 42 | xxx | [Mol C3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201402930) |
+| 43 | xxx | [mol 5](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/ejoc.201501181) |
+| 44 | xxx | scale 1e-3 [mol 9](https://pubs.acs.org/doi/full/10.1021/jacs.7b05671) |
+| 45 | xxx | [mol 1 protonated](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201603591) |
+| 46 | xxx | [mol 1c](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201604398) |
+| 47 | xxx | [mol 1c](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b01087) |
+| 48 | xxx | [mol 1](https://pubs.acs.org/doi/10.1021/acs.orglett.6b00747) |
+| 49 | excluded, "cast films" | [mol 4](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201801414) |
+| 50 | xxx | - |
 | 51 | xxx | [mol 1–3](https://pubs.rsc.org/en/content/articlelanding/2015/ra/c4ra11488d) |
 | 52 |xxx  | - |
 | 53 | xxx | -|
