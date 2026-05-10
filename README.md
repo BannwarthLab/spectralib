@@ -43,10 +43,6 @@ A valid example header, e.g., for molecule 60 (`data/spectra/60/60_CPL.csv`) loo
 
 This refers to the CPL spectrum of FL1-C1 from [this article](10.3390/molecules23102606), measured at room temperature (293.15 K) with a concentration of 5e-5 M in MeOH using $\lambda_\mathrm{irr} = 255~\mathrm{nm}$. The reported intensity is a $\Delta I$.
 
-### Further Notes: 
-- Measurements in thin films or matrices are omitted and deliberately excluded from the dataset at the moment.
-- Some geometries were simplified (truncation of flexible alkane chains, tBu -> Me, etc.) to be computationally more tractable, and may differ from the Lewis structures illustrated above.  
-
 ### Data Format
 
 - CPL spectra: 
@@ -66,7 +62,21 @@ This refers to the CPL spectrum of FL1-C1 from [this article](10.3390/molecules2
 ```
 All geometries are optimized with the [semiempirical electronic structure theory method GFN2-xTB](https://pubs.acs.org/doi/10.1021/acs.jctc.8b01176) as implemented in the [xtb program](https://github.com/grimme-lab/xtb) (version 6.7.0):
 `xtb coord.xyz --opt --chrg <int> --uhf <int>`
-If molecules are charged or have unpaired electrons in their electronic ground states, this information is contained in the `.CHRG` and `.UHF` files. 
+
+If molecules are charged or have unpaired electrons in their electronic ground states, this information is contained in the `.CHRG` and `.UHF` files.  
+
+### Further Notes: 
+- Measurements in thin films or matrices are omitted and deliberately excluded from the dataset at the moment.
+- Some geometries were simplified (truncation of flexible alkane chains, tBu -> Me, etc.) to be computationally more tractable, and may differ from the Lewis structures illustrated above.  
+
+### File Names
+Systems with more than one molecule carry alphabetic labels. One example is system 33, where we find: 
+- `33a_LUM.csv`, the luminescence spectrum of `structures/33a.xyz`
+- `33ab_CPL.csv`, the CPL spectrum of a noncovalent complex of `33a.xyz` and `33b.xyz`  
+
+If data for systems measured at different experimental conditions is added, these carry integer suffixes `_1`. Currently, these files are not present in the database, but an example would look like:
+- `1_CPL.csv` - e.g. measurement in Tol
+- `1_CPL_1.csv` - e.g. measurement in CHex
 
 ## Running Tests
 
@@ -91,7 +101,6 @@ python3 -m pytest tests -v
 | 9,10  | [(S)-1 and -2](https://doi.org/10.1002/asia.201200725) |
 | 11 | [Nur 1](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b00511) |
 | 12 | [$\Delta_\mathrm{Ir}-\mathbf{A}$](https://onlinelibrary.wiley.com/doi/epdf/10.1002/anie.201704263) |
-| 13 | [system 2](https://pubs.acs.org/doi/full/10.1021/acs.jpcc.7b00654) |
 | 14 | [system 3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/cptc.201700106) |
 | 15 | [system 1](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201602684) |
 | 16,17 | [System 1 und 5](https://onlinelibrary.wiley.com/doi/epdf/10.1002/chir.22176) |
@@ -106,7 +115,6 @@ python3 -m pytest tests -v
 | 27 | [CPL TADF mol 1, BODIPY](https://pubs.acs.org/doi/full/10.1021/ja412294s) |
 | 28 | [Chiral TTM Radical](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.202000098) |
 | 29 | [TTMCz kuehne](https://chemrxiv.org/doi/full/10.26434/chemrxiv.10001626/v1) |
-| 30 | [radical anion NDI](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.9b02269) |
 | 31 | Data needs to be scaled by 1e-4 [TADF mol](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/adfm.201800051) |
 | 32 | Scale cpl 1e-3 [Cyclophane](https://pubs.acs.org/doi/full/10.1021/acs.orglett.8b02995) |
 | 33 | [molecular assembly cpf](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.1c02013) |
