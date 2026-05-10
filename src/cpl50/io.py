@@ -1,0 +1,321 @@
+""" Contains parser functions. """
+
+from __future__ import annotations
+
+import csv
+import numpy as np
+
+from pathlib import Path
+from typing import Tuple, List, Dict, Optional
+
+from cpl50.utils import (
+    REQUIRED_FIELDS,
+    DOI_REGEX,
+    VALID_QUANT_CP,
+    VALID_QUANT_LUM,
+    VALID_SOLVENTS,
+    VALID_UNIT_CP,
+    VALID_UNIT_LUM,
+    Spectrum
+)
+
+def read_spectrum(path: str) -> Spectrum:
+    """ Read spectrum from .csv file and check for valid header data. 
+    
+    Args:
+        path (str): Path to the .csv file.
+
+    Returns:
+        Spectrum: Dataclass containing x, y arrays and the header as metadata dict.
+
+    Raises:
+        ValueError: If the header does not have exactly 8 fields.
+        ValueError: If any header field fails validation (see _validate_header).
+        ValueError: If the data block does not have exactly two columns.
+        ValueError: If the x-axis is not strictly increasing.
+    """
+
+    # Parse header line, split and build dict 
+    with open(path, "r") as f:
+        header = f.readline()
+
+    parts = [p.strip() for p in header.strip().split(",")]
+    if len(parts) != 8:
+        raise ValueError(f"Header must have 8 fields, got {len(parts)} in {path}")
+
+    hdict = dict(zip(REQUIRED_FIELDS, parts))
+    hdict["file"] = path
+    
+    # Check validity of entries
+    _validate_header(hdict)
+
+    data = np.loadtxt(path, delimiter=",", skiprows=1)
+
+    if data.ndim != 2 or data.shape[1] != 2:
+        raise ValueError(f"Spectrum must have exactly two columns in {path}")
+
+    x, y = data.T
+    chk = np.diff(x) > 0
+    if not np.all(chk):
+        failed_lines = np.where(~chk)[0] + 2
+        raise ValueError(
+            f"x-axis must be strictly increasing in {path};" 
+            f"wrong line(s): {failed_lines.tolist()}"
+            )
+
+    return Spectrum(x=x, y=y, metadata=hdict)
+
+
+def _validate_header(header_data: Dict[str, str], filename: Optional[str] = None) -> None:
+    """ Check that entries in header are valid for both LUM and CPL files. 
+
+    Args:
+        header_data (Dict[str, str]): Parsed header fields. 
+    
+    Returns:
+        None. 
+
+    Notes:
+        Expected keys in header_data:
+        - DOI: must match DOI_REGEX, cannot be 0.
+        - T: Temperature, or 0 if not reported.
+        - c: Concentration, or 0 if not reported.
+        - solv: Solvent name, cannot be 0.
+        - irrad: Irradiation wavelength, or 0 if not reported.
+        - file: Original filename used to infer file spectra type (CPL or LUM).
+        - quant: Measured quantity; cannot be 0.
+        - unit: Unit of quant, or 0 if dimensioless/not reported.
+
+    Raises:
+        ValueError: If DOI is missing, 0, or does not match DOI_REGEX.
+        ValueError: If T is provided, but <0.
+        ValueError: If c is provided but <0.
+        ValueError: If solv is provided but not in VALID_SOLVENTS.
+        ValueError: If irrad is provided but <100.
+        ValueError: If quant or unit are inconsistent with file type (CPL or LUM).
+    """
+
+    filename = header_data["file"]
+    fstem = Path(filename).stem.upper()
+
+    # DOI must always be present and not 0
+    doi = header_data["DOI"]
+    if not doi:
+        raise ValueError(f"Missing DOI in {filename}")
+    if doi == "0":
+        raise ValueError(f"DOI must not be '0' in {filename}")
+    if not DOI_REGEX.match(doi):
+        raise ValueError(f"Invalid DOI format '{doi}' in {filename}")
+
+    # Temperature (optional), but must be positive if given
+    if header_data["T"] != "0":
+        T = float(header_data["T"])
+        if T <= 0:
+            raise ValueError(f"Temperature must be positive in {filename}")
+
+    # Concentration (optional), but must be positive if given
+    if header_data["c"] != "0":
+        c = float(header_data["c"])
+        if c <= 0:
+            raise ValueError(f"Concentration must be positive in {filename}")
+
+    # Solvent has to be in known solvent 
+    if header_data["solv"] not in VALID_SOLVENTS:
+        raise ValueError(f"Invalid solvent '{header_data['solv']}' in {filename}")
+
+    # Irradiation wavelength (optional), but if != 0, should be >= 100
+    if header_data["irrad"] != "0":
+        irrad = float(header_data["irrad"])
+        if irrad < 100:
+            raise ValueError(f"Irradiation wavelength must be >= 100 in {filename}")
+
+    # Measured Quantity and unit, must match declared file type
+    if "CPL" in fstem:
+        if header_data["quant"] not in VALID_QUANT_CP:
+            raise ValueError(f"Invalid CPL quantity '{header_data['quant']}' in {filename}")
+        if header_data["unit"] not in VALID_UNIT_CP:
+            raise ValueError(f"Invalid CPL unit '{header_data['unit']}' in {filename}")
+        
+    elif "LUM" in fstem:
+        if header_data["quant"] not in VALID_QUANT_LUM:
+            raise ValueError(f"Invalid LUM quantity '{header_data['quant']}' in {filename}")
+        if header_data["unit"] not in VALID_UNIT_LUM:
+            raise ValueError(f"Invalid LUM unit '{header_data['unit']}' in {filename}")
+        
+def read_xyz(file: str) -> Tuple[np.ndarray,np.ndarray]:
+    """Read xyz file.
+
+    Args:
+        file (str): Input xyz file.
+
+    Returns:
+        tuple: A tuple containing element symbols and coordinates.
+    
+    Raises:
+        ValueError: If parsed number of atoms in first line does not match length of element symbol list
+    """
+
+    elms : List[str] = []
+    coords : List[List[float]] = []
+
+    with open(file) as f:
+        nat = int(f.readline().strip())
+        f.readline()  # Skip comment line
+        for line in f:
+            l = line.strip()
+            if not l:
+                continue
+            elms.append(l.split()[0].lower()) # store lower case elements
+            coords.append([float(a) for a in l.split()[1:4]])
+
+    #
+    if len(elms) != nat:
+        raise ValueError(
+            f"Expected {nat} atoms in {file}, found {len(elms)}"
+        )
+            
+    return np.array(elms, dtype=str), np.array(coords)
+
+
+def sort_csv_by_x(input_file : str, output_file : str) -> None:
+    """ Read a .csv file, sort rows by the first column, and write to a new file.
+    
+    Args:
+        input_file (str): Path to the input .csv file.
+        output_file (str): Path to the output .csv file.
+
+    Returns:
+        None. 
+    """
+    with open(input_file, 'r') as f:
+        lines = f.readlines()
+
+    # Keep header
+    header = lines[0].strip()
+
+    rows : List[Tuple[float, float]] = []
+    for line in lines[1:]:
+        l = line.strip()
+        if not l: # skip empty lines
+            continue
+        parts = line.strip().split(',')
+
+        rows.append((float(parts[0]), float(parts[1])))
+
+
+    # Sort by x value
+    rows.sort(key=lambda row: row[0])
+
+    # Write sorted data
+    with open(output_file, 'w', newline='') as f:
+        f.write(header + '\n')
+        writer = csv.writer(f)
+        for row in rows:
+            writer.writerow(row)
+
+def summarize_dataset(spectra_dir: str) -> None:
+    """ Generate formatted printout of all spectra in dataset directory. 
+    
+    Each spectrum is listed with the header data. Files that fail to parse are
+    reported as errors rather than aborting the summary. 
+
+    Args:
+        spectra_dir (str): Path to root dir containing .csv files.
+    
+    Returns:
+        None.
+    
+    """
+    spectra_path = Path(spectra_dir)
+    files = sorted(spectra_path.rglob("*.csv"))
+
+    def _fmt(value : str, suffix : str = "") -> str:
+        """Return value + suffix. """
+        return f"{value}{suffix}" if value != "0" else "-"
+    
+    COL = {
+        "file":   18,
+        "mol":    12,
+        "doi":    12,
+        "T":       9,
+        "c":      10,
+        "solv":    6,
+        "irrad":   9,
+        "quant":   8,
+        "unit":    6,
+    }
+
+    def _row(file : str,
+             mol : str,
+             doi : str,
+             T : str,
+             c : str,
+             solv: str,
+             irrad: str,
+             quant : str,
+             unit : str,
+             error : str = "") -> str:
+        if error:
+            return f"  {'ERROR':<{COL['file']}}  {file:<40}  {error}"
+        return (
+            f"  {file:<{COL['file']}}"
+            f"  {mol:<{COL['mol']}}"
+            f"  {doi:<{COL['doi']}}"
+            f"  {T:<{COL['T']}}"
+            f"  {c:<{COL['c']}}"
+            f"  {solv:<{COL['solv']}}"
+            f"  {irrad:<{COL['irrad']}}"
+            f"  {quant:<{COL['quant']}}"
+            f"  {unit:<{COL['unit']}}"
+        )
+    
+    header_row = _row(
+        file="File", mol="Molecule", doi="DOI",
+        T="T (K)", c="c (M)", solv="Solv",
+        irrad="λirr (nm)", quant="Quant", unit="Unit",
+    )
+    separator = "  " + "-" * (sum(COL.values()) + 2 * len(COL))
+
+    lines: List[str] = [
+        "CPL50 Dataset Summary",
+        f"  {len(files)} file(s) found in {spectra_dir}",
+        "=" * len(separator),
+        header_row,
+        separator,
+    ]
+
+    n_ok = 0
+    n_err = 0
+    
+    for file in files:
+        short_name = file.name
+        try:
+            spec = read_spectrum(str(file))
+            m = spec.metadata
+            lines.append(_row(
+                file=short_name,
+                mol=m["molname"],
+                doi=m["DOI"][:COL["doi"]],        # truncate long DOIs
+                T=_fmt(m["T"], " K"),
+                c=_fmt(m["c"], " M"),
+                solv=_fmt(m["solv"]),
+                irrad=_fmt(m["irrad"], " nm"),
+                quant=m["quant"],
+                unit=_fmt(m["unit"]),
+            ))
+            n_ok += 1
+        except Exception as exc:
+            lines.append(_row(
+                file="", mol="", doi="", T="", c="",
+                solv="", irrad="", quant="", unit="",
+                error=f"{short_name}: {exc}",
+            ))
+            n_err += 1
+
+    lines += [
+        separator,
+        f"  {n_ok} parsed successfully, {n_err} error(s).",
+    ]
+
+    print("\n".join(lines))
+    return
