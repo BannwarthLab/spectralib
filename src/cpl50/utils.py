@@ -37,6 +37,12 @@ VALID_SOLVENTS = {
     "chloroform", # chloroform
     "chcl3", 
     "p-dioxane",
+    "1-4-dioxane",
+    "dmf",
+    "chex",
+    "cyclohexane",
+    "ccl4",
+    "me-chex",
     #"0",      # allow missing value
 }
 
@@ -44,6 +50,7 @@ VALID_QUANT_CP = {
     "cpl",
     "cpf",
     "di",
+    "glum",
 }
 
 VALID_UNIT_CP = {

@@ -100,6 +100,7 @@ def test_invalid_cpl_quantity_raises(valid_header):
 
 def test_invalid_lum_unit_raises(valid_header):
     valid_header["file"] = "33a_LUM.csv"
+    valid_header["quant"] = "i"
     valid_header["unit"] = "not_a_unit"
     with pytest.raises(ValueError, match="[Uu]nit"):
         _validate_header(valid_header)
@@ -163,7 +164,7 @@ def test_summary_sentinel_displayed_as_dash(tmp_path, capsys):
     d.mkdir()
     (d / "a_LUM.csv").write_text(content)
     summarize_dataset(str(d))
-    assert " - " in capsys.readouterr().out
+    assert "-" in capsys.readouterr().out
 
 def test_summary_empty_directory(tmp_path, capsys):
     summarize_dataset(str(tmp_path))

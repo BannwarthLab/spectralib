@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import csv
+import re
 import numpy as np
 
 from pathlib import Path
@@ -120,7 +121,7 @@ def _validate_header(header_data: Dict[str, str], filename: Optional[str] = None
             raise ValueError(f"Concentration must be positive in {filename}")
 
     # Solvent has to be in known solvent 
-    if header_data["solv"] not in VALID_SOLVENTS:
+    if header_data["solv"].lower() not in VALID_SOLVENTS:
         raise ValueError(f"Invalid solvent '{header_data['solv']}' in {filename}")
 
     # Irradiation wavelength (optional), but if != 0, should be >= 100
@@ -131,15 +132,15 @@ def _validate_header(header_data: Dict[str, str], filename: Optional[str] = None
 
     # Measured Quantity and unit, must match declared file type
     if "CPL" in fstem:
-        if header_data["quant"] not in VALID_QUANT_CP:
+        if header_data["quant"].lower() not in VALID_QUANT_CP:
             raise ValueError(f"Invalid CPL quantity '{header_data['quant']}' in {filename}")
-        if header_data["unit"] not in VALID_UNIT_CP:
+        if header_data["unit"].lower() not in VALID_UNIT_CP:
             raise ValueError(f"Invalid CPL unit '{header_data['unit']}' in {filename}")
         
     elif "LUM" in fstem:
-        if header_data["quant"] not in VALID_QUANT_LUM:
+        if header_data["quant"].lower() not in VALID_QUANT_LUM:
             raise ValueError(f"Invalid LUM quantity '{header_data['quant']}' in {filename}")
-        if header_data["unit"] not in VALID_UNIT_LUM:
+        if header_data["unit"].lower() not in VALID_UNIT_LUM:
             raise ValueError(f"Invalid LUM unit '{header_data['unit']}' in {filename}")
         
 def read_xyz(file: str) -> Tuple[np.ndarray,np.ndarray]:
@@ -162,11 +163,11 @@ def read_xyz(file: str) -> Tuple[np.ndarray,np.ndarray]:
         nat = int(f.readline().strip())
         f.readline()  # Skip comment line
         for line in f:
-            l = line.strip()
-            if not l:
+            lin = line.strip()
+            if not lin:
                 continue
-            elms.append(l.split()[0].lower()) # store lower case elements
-            coords.append([float(a) for a in l.split()[1:4]])
+            elms.append(lin.split()[0].lower()) # store lower case elements
+            coords.append([float(a) for a in lin.split()[1:4]])
 
     #
     if len(elms) != nat:
@@ -195,8 +196,8 @@ def sort_csv_by_x(input_file : str, output_file : str) -> None:
 
     rows : List[Tuple[float, float]] = []
     for line in lines[1:]:
-        l = line.strip()
-        if not l: # skip empty lines
+        lin = line.strip()
+        if not lin: # skip empty lines
             continue
         parts = line.strip().split(',')
 
@@ -213,94 +214,119 @@ def sort_csv_by_x(input_file : str, output_file : str) -> None:
         for row in rows:
             writer.writerow(row)
 
-def summarize_dataset(spectra_dir: str) -> None:
-    """ Generate formatted printout of all spectra in dataset directory. 
-    
-    Each spectrum is listed with the header data. Files that fail to parse are
-    reported as errors rather than aborting the summary. 
+
+def summarize_dataset(spectra_dir: str, select: Optional[List[int]] = None) -> None:
+    """Generate formatted printout of all spectra in dataset directory.
+
+    Each spectrum is listed with its header data, sorted by numeric molecule ID.
+    Files that fail to parse are reported as errors rather than aborting the summary.
+    Optional fields with sentinel value '0' are shown as '-'.
 
     Args:
         spectra_dir (str): Path to root dir containing .csv files.
-    
-    Returns:
-        None.
-    
+        select (Optional[List[int]]): If given, only print entries whose leading
+            numeric ID is in this list. E.g. select=[1, 33, 60].
     """
     spectra_path = Path(spectra_dir)
     files = sorted(spectra_path.rglob("*.csv"))
 
-    def _fmt(value : str, suffix : str = "") -> str:
-        """Return value + suffix. """
-        return f"{value}{suffix}" if value != "0" else "-"
-    
+    _ID_RE = re.compile(r"^(\d+)")
+
+    def _sort_key(p: Path) -> Tuple:
+        m = _ID_RE.match(p.stem)
+        return (int(m.group(1)), p.stem) if m else (float("inf"), p.stem)
+
+    def _id(p: Path) -> Optional[int]:
+        m = _ID_RE.match(p.stem)
+        return int(m.group(1)) if m else None
+
+    files = sorted(files, key=_sort_key)
+
+    if select is not None:
+        select_set = set(select)
+        files = [f for f in files if _id(f) in select_set]
+
+    def _fmt(value: str, suffix: str = "") -> str:
+        return f"{value.lower()}{suffix}" if value != "0" else "-"
+
+    def _trunc(s: str, width: int) -> str:
+        """Truncate string to width, appending … if cut."""
+        return s if len(s) <= width else s[: width - 1] + "…"
+
     COL = {
-        "file":   18,
-        "mol":    12,
-        "doi":    12,
-        "T":       9,
+        "file":   20,
+        "mol":    16,
+        "doi":    36,
+        "T":      10,
         "c":      10,
-        "solv":    6,
-        "irrad":   9,
-        "quant":   8,
+        "solv":   12,
+        "irrad":  10,
+        "quant":   6,
         "unit":    6,
     }
 
-    def _row(file : str,
-             mol : str,
-             doi : str,
-             T : str,
-             c : str,
-             solv: str,
-             irrad: str,
-             quant : str,
-             unit : str,
-             error : str = "") -> str:
+    def _row(
+        file: str, mol: str, doi: str,
+        T: str, c: str, solv: str,
+        irrad: str, quant: str, unit: str,
+        error: str = "",
+    ) -> str:
         if error:
-            return f"  {'ERROR':<{COL['file']}}  {file:<40}  {error}"
+            return f"  {'ERROR':{COL['file']}}  {file:<50}  {error}"
         return (
-            f"  {file:<{COL['file']}}"
-            f"  {mol:<{COL['mol']}}"
-            f"  {doi:<{COL['doi']}}"
-            f"  {T:<{COL['T']}}"
-            f"  {c:<{COL['c']}}"
-            f"  {solv:<{COL['solv']}}"
-            f"  {irrad:<{COL['irrad']}}"
-            f"  {quant:<{COL['quant']}}"
-            f"  {unit:<{COL['unit']}}"
+            f"  {_trunc(file,  COL['file'])  :{COL['file']}}"
+            f"  {_trunc(mol,   COL['mol'])   :{COL['mol']}}"
+            f"  {_trunc(doi,   COL['doi'])   :{COL['doi']}}"
+            f"  {T              :{COL['T']}}"
+            f"  {c              :{COL['c']}}"
+            f"  {_trunc(solv,  COL['solv'])  :{COL['solv']}}"
+            f"  {irrad          :{COL['irrad']}}"
+            f"  {quant          :{COL['quant']}}"
+            f"  {unit           :{COL['unit']}}"
         )
-    
+
     header_row = _row(
         file="File", mol="Molecule", doi="DOI",
-        T="T (K)", c="c (M)", solv="Solv",
+        T="T (K)", c="c (M)", solv="Solvent",
         irrad="λirr (nm)", quant="Quant", unit="Unit",
     )
-    separator = "  " + "-" * (sum(COL.values()) + 2 * len(COL))
+    sep_width = sum(COL.values()) + 2 * len(COL) + 2
+    separator  = "-" * sep_width
+    thin_sep   = "·" * sep_width
 
     lines: List[str] = [
-        "CPL50 Dataset Summary",
-        f"  {len(files)} file(s) found in {spectra_dir}",
-        "=" * len(separator),
+        "",
+        "  CPL50 Dataset Summary",
+        f"  {len(files)} file(s) in {spectra_dir}",
+        "",
         header_row,
         separator,
     ]
 
-    n_ok = 0
+    n_ok  = 0
     n_err = 0
-    
+    prev_id: Optional[int] = None
+
     for file in files:
+        current_id = _id(file)
         short_name = file.name
+
+        # Blank line between groups (different leading ID)
+        if prev_id is not None and current_id != prev_id:
+            lines.append(thin_sep)
+
         try:
             spec = read_spectrum(str(file))
             m = spec.metadata
             lines.append(_row(
                 file=short_name,
                 mol=m["molname"],
-                doi=m["DOI"][:COL["doi"]],        # truncate long DOIs
+                doi=m["DOI"],
                 T=_fmt(m["T"], " K"),
                 c=_fmt(m["c"], " M"),
                 solv=_fmt(m["solv"]),
                 irrad=_fmt(m["irrad"], " nm"),
-                quant=m["quant"],
+                quant=m["quant"].lower(),
                 unit=_fmt(m["unit"]),
             ))
             n_ok += 1
@@ -312,10 +338,12 @@ def summarize_dataset(spectra_dir: str) -> None:
             ))
             n_err += 1
 
+        prev_id = current_id
+
     lines += [
         separator,
-        f"  {n_ok} parsed successfully, {n_err} error(s).",
+        f"  {n_ok} parsed successfully,  {n_err} error(s).",
+        "",
     ]
 
     print("\n".join(lines))
-    return
