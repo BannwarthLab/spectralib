@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cpl50"
-version = "0.1.0"
-description = "Benchmarking spectral overlap and shifts"
+version = "0.0.1"
+description = "Analysis Tools for LUM and CPL Dataset."
 authors = [{name = "Mike Pauls"}]
 requires-python = ">=3.10"
 dependencies = [
