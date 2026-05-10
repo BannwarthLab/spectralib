@@ -10,24 +10,48 @@ from scipy.integrate import trapezoid
 
 from cpl50.utils import Spectrum
 
-OverlapMode = ["area", "cosine", "absolute"]
-
-
 def _interpolate_spectrum(x: np.ndarray, y: np.ndarray, x_new: np.ndarray) -> np.ndarray:
-    """Interpolate spectrum onto a uniform grid."""
+    """ Interpolate spectrum on a uniform grid with cubic splines. 
+    
+        Args:
+            x (np.ndarray): Init. datapoints in x.
+            y (np.ndarray): Init. datapoints in y.
+            x_new (np.ndarray): Grid to interpolate y on.
+
+        Returns:
+            y_new (np.ndarray): Interpolated y values on x_new.
+    """
     f = interp1d(x, y, kind="cubic", bounds_error=False, fill_value=0.0)
+
     return f(x_new)
 
 
 def _uniform_grid(x_ref: np.ndarray, x_tar: np.ndarray, n_points: int) -> np.ndarray:
-    """Build a uniform grid spanning both spectra."""
+    """Build a uniform grid from two sets of datapoints.
+    
+        Args:
+            x_ref (np.ndarray): Datapoints of first spectrum,
+            x_tar (np.ndarray): Datapts of second spectrum.
+            n_points (np.ndarray): Number of points for interpol. 
+        
+        Returns:
+            List of equidistant points spanning min/max of both spectra. 
+    """
     x_min = min(np.min(x_ref), np.min(x_tar))
     x_max = max(np.max(x_ref), np.max(x_tar))
     return np.linspace(x_min, x_max, n_points)
 
 
-def _normalize(y: np.ndarray, x: np.ndarray, mode: str = "area") -> float:
-    """Compute normalization factor for the requested overlap mode."""
+def _normalize(x: np.ndarray, y: np.ndarray, mode: str = "area") -> float:
+    """Compute different normalization factors for the computation of spectral overlap.
+    
+        Args:
+            x, y (np.ndarray): datapts in x,y. 
+            mode (str, opt): Overlap "mode" that depends normalization constant to be returned. Default: "area".
+        
+        Returns:
+            normalization constant.
+    """
     if mode == "area":
         return trapezoid(y, x)
     if mode == "cosine":
@@ -38,19 +62,29 @@ def _normalize(y: np.ndarray, x: np.ndarray, mode: str = "area") -> float:
 
 
 def _evaluate_overlap(
-    y_ref: np.ndarray,
-    y_target: np.ndarray,
     x: np.ndarray,
+    y1: np.ndarray,
+    y2: np.ndarray,
     mode: str = "area",
 ) -> float:
-    """Compute the overlap value for two interpolated spectra on the same grid."""
-    if mode == "absolute":
-        overlap_raw = trapezoid(np.abs(y_ref * y_target), x)
-    else:
-        overlap_raw = trapezoid(y_ref * y_target, x)
+    """ Compute normalized overlap for two spectra interpolated on the same x grid. 
+    
+        Args:
+            x (np.ndarray): Shared x datapts of the two y series.
+            y1 (np.ndarray): Values of first function interpolated on x.
+            y2 (np.ndarray): Values of second function interpolated on x.
+            mode (str, opt): Expression used to compute overlap. Default: "area".
+        Returns:
+            
+    """
 
-    norm_ref = _normalize(y_ref, x, mode)
-    norm_target = _normalize(y_target, x, mode)
+    if mode == "absolute":
+        overlap_raw = trapezoid(np.abs(y1 * y2), x)
+    else:
+        overlap_raw = trapezoid(y1 * y2, x)
+
+    norm_ref = _normalize(y1, x, mode)
+    norm_target = _normalize(y2, x, mode)
 
     if norm_ref == 0 or norm_target == 0:
         raise ValueError(
@@ -62,19 +96,25 @@ def _evaluate_overlap(
 
 
 def compute_overlap(
-    reference: Spectrum,
+    ref: Spectrum,
     target: Spectrum,
     mode: str = "area",
-    n_points: int = 1000,
+    npts: int = 1000,
 ) -> float:
-    """Compute overlap between two spectra by interpolating them on a uniform grid."""
-    x_ref = reference.x
-    y_ref = reference.y
+    """Compute overlap between two sets of spectra by interpolating them on a uniform grid.
+    
+        Args:
+            ref (np.ndarray): Reference spectrum data.
+            target (np.ndarray): Target spectrum data.
+            mode (str, opt): Eq. to compute normalized overlap with. Default: "area".
+            npts (int, opt): Number of points for interpolation. Default: 1000.
 
-    x_tar = target.x
-    y_tar = target.y
+    """
+    x_ref, y_ref = ref.x, ref.y
 
-    x_grid = _uniform_grid(x_ref, x_tar, n_points)
+    x_tar, y_tar = target.x, target.y
+
+    x_grid = _uniform_grid(x_ref, x_tar, npts)
     y_ref_interp = _interpolate_spectrum(x_ref, y_ref, x_grid)
     y_tar_interp = _interpolate_spectrum(x_tar, y_tar, x_grid)
 
@@ -88,7 +128,7 @@ def find_best_shift(
     n_points: int = 1000,
     overlap_mode: str = "cosine",
 ) -> List[np.ndarray, np.ndarray]:
-    """Scan target shifts and return the full overlap history.
+    """ Compute energetic shift that maximizes the spectral overlap between two spectra sets.
 
     Args:
         reference: Reference spectrum as a Spectrum dataclass.
