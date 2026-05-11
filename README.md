@@ -115,6 +115,12 @@ python3 -m pytest tests -v
 | 17 | (R)-2 | 
 | 18 | [(R)-1](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201702143) | 
 | 19 | (RRR)-2 | 
+| 20 | [(M)-1c](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201604398) |
+| 21 | [(+)-4](https://pubs.acs.org/doi/full/10.1021/ja300278e) | 
+| 22 | [(P-P)-8b](https://pubs.acs.org/doi/full/10.1021/jacs.7b06848)
+| ***23 | [(+)-6](https://pubs.acs.org/doi/full/10.1021/ja300278e) | 
+| 24 | [(+)-(M)-1c](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b01087) | 
+| 25 | [(p)-(+)-1](https://pubs.acs.org/doi/10.1021/acs.orglett.6b00747)
 
 
 
@@ -127,11 +133,10 @@ python3 -m pytest tests -v
 | 14 | [system 3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/cptc.201700106) |
 | 15 | [system 1](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201602684) |
 | 18 | [Iridium Complex](https://www.sciencedirect.com/science/article/pii/S0021967316306501) |
-| 19,20 | [Fig. S6 in SI](https://pubs.acs.org/doi/full/10.1021/ja300278e) |
+
 | 21 | [mol 1, Fig. 3](https://pubs.rsc.org/en/content/articlehtml/2016/sc/c6sc01808d) |
 | 22 | [mol 10](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201801908) |
 | 23 | [schema 1](https://pubs.acs.org/doi/full/10.1021/jp504307v) |
-| 24 | [mol 8b](https://pubs.acs.org/doi/full/10.1021/jacs.7b06848) |
 | 25 | [CPF TADF mol](https://pubs.rsc.org/en/content/articlepdf/2015/cc/c5cc04105h) |
 | 26 | [CPL TADF mol 1](https://pubs.acs.org/doi/full/10.1021/jacs.6b00850) |
 | 27 | [CPL TADF mol 1, BODIPY](https://pubs.acs.org/doi/full/10.1021/ja412294s) |
@@ -148,9 +153,6 @@ python3 -m pytest tests -v
 | 43 | [mol 5](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/ejoc.201501181) |
 | 44 | [mol 9](https://pubs.acs.org/doi/full/10.1021/jacs.7b05671) scale 1e-3 |
 | 45 | [mol 1 protonated](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201603591) |
-| 46 | [mol 1c](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201604398) |
-| 47 | [mol 1c](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b01087) |
-| 48 | [mol 1](https://pubs.acs.org/doi/10.1021/acs.orglett.6b00747) |
 | 50 | [mol 7aa](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201605000) |
 | 59 | 12-CPP, scale with 1e-3 |
 | 60 | FL1-C1, scale with 1e-3 |
