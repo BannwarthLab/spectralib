@@ -96,11 +96,21 @@ python3 -m pytest tests -v
 
 | Index | Reference |
 |------|-------|
+| 1 |  [(P)-c1](https://pubs.acs.org/doi/full/10.1021/acs.jctc.6b00109) | 
+| 2 | (P)-c3 | 
+| 3 | [(P)-3](https://pubs.acs.org/doi/10.1021/ol4005036) | 
+| 4 | [(M)-3a](https://pubs.rsc.org/en/content/articlepdf/2014/sc/c3sc53442a) | 
+| 5 | [(P-P-1)](https://pubs.acs.org/doi/full/10.1021/acs.joc.9b00389) + [Correction](https://pubs.acs.org/doi/10.1021/acs.joc.9b01513) |
+| 6 | (P-P)-1*2H^+ 2OTf^- | 
+| 7  | (P-P)-1*Zn(OAc)2 | 
+
+
+
+
+
+| Index | Reference |
+|------|-------|
 | 1 | [Mol 2](https://www.sciencedirect.com/science/article/pii/S1010603015004414) |
-| 2,3 | [Extract mol c1, c3](https://pubs.acs.org/doi/full/10.1021/acs.jctc.6b00109), [Experimental ref](https://pubs.acs.org/doi/full/10.1021/jp4105695) |
-| 4  | [Sila-Helicene 3 (Fig. 1)](https://pubs.acs.org/doi/10.1021/ol4005036) |
-| 5 | [Pt Helicene 3a](https://pubs.rsc.org/en/content/articlepdf/2014/sc/c3sc53442a) |
-| 6–8 | [Switchable Bishelicene Zn](https://pubs.acs.org/doi/full/10.1021/acs.joc.9b00389), [Correction](https://pubs.acs.org/doi/10.1021/acs.joc.9b01513) |
 | 9,10  | [(S)-1 and -2](https://doi.org/10.1002/asia.201200725) |
 | 11 | [Nur 1](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b00511) |
 | 12 | [$\Delta_\mathrm{Ir}-\mathbf{A}$](https://onlinelibrary.wiley.com/doi/epdf/10.1002/anie.201704263) |
