@@ -1,13 +1,13 @@
-# A Dataset for Luminescence and Circularly Polarized Luminescence Data
+# A Dataset for Luminescence and Circularly Polarized Luminescence Spectra
 
 [![License](https://img.shields.io/badge/License-CC%20BY%20SA%204.0-lightgrey)](https://creativecommons.org/licenses/by/4.0/)
 [![Repository](https://img.shields.io/badge/Repository-RWTH%20Aachen-blue)](https://git.rwth-aachen.de/bannwarthlab/cpl50)
 
-![Lewis Structures](./structures.pdf)
+![Lewis Structures](./structures2.png)
 
-This project collects: 
-- Experimental luminescence (`data/spectra/*LUM.csv`) and CPL (`data/spectra/*CPL.csv`) spectra
-- Molecular Structures (`data/structures/*.xyz`) in xyz format.
+This project contains: 
+- Experimental luminescence (`data/spectra/*LUM.csv`) and CPL (`data/spectra/*CPL.csv`) spectra.
+- Molecular structures (`data/structures/*.xyz`) in xyz format.
 
 
 # File Description
@@ -26,12 +26,12 @@ with:
 - `c`: The concentration (in M) at which the measurements were performed.
     If none was given/found, `0` is added here.
 - `solv`: A (short) name of the solvent used in the experiments.
-    A list of supported solvents for the tests may be found in `src/cpl50/utils.py`.
+    A list of accepted solvents may be found in `src/cpl50/utils.py`.
 
 - `irrad`: The used irradiation wavelength (in nm).
     If none was given/found, `0` is added here.
 
-- `quant`: The experimental quantity measured, e.g. $\Delta I$ (`di`) in CPF.
+- `quant`: The experimental quantity measured, e.g. `di` ($\Delta I$) in CPF.
 
 - `unit`: The unit of `quant`, if provided. 
     If none was given/found, or the quantity is dimensionless, `0` is added here.
@@ -52,7 +52,7 @@ This refers to the CPL spectrum of FL1-C1 from [this article](10.3390/molecules2
 <wavelength2>, <quant2>
 ...
 ```
-- Molecular Geometries (in xyz format): 
+- Molecular geometries: 
 ```bash
 <natoms>
 <comment line>
@@ -61,12 +61,12 @@ This refers to the CPL spectrum of FL1-C1 from [this article](10.3390/molecules2
 ...
 ```
 All geometries are optimized with the [semiempirical electronic structure theory method GFN2-xTB](https://pubs.acs.org/doi/10.1021/acs.jctc.8b01176) as implemented in the [xtb program](https://github.com/grimme-lab/xtb) (version 6.7.0):
-`xtb coord.xyz --opt --chrg <int> --uhf <int>`
+`xtb coord.xyz --opt (--chrg <int> --uhf <int>)`
 
 If molecules are charged or have unpaired electrons in their electronic ground states, this information is contained in the `.CHRG` and `.UHF` files.  
 
-### Further Notes: 
-- Measurements in thin films or matrices are omitted and deliberately excluded from the dataset at the moment.
+### Further Notes
+- Measurements in thin films, matrices, or gels are omitted and deliberately excluded from the dataset at the moment.
 - Some geometries were simplified (truncation of flexible alkane chains, tBu -> Me, etc.) to be computationally more tractable, and may differ from the Lewis structures illustrated above.  
 
 ### File Names
@@ -74,13 +74,16 @@ Systems with more than one molecule carry alphabetic labels. One example is syst
 - `33a_LUM.csv`, the luminescence spectrum of `structures/33a.xyz`
 - `33ab_CPL.csv`, the CPL spectrum of a noncovalent complex of `33a.xyz` and `33b.xyz`  
 
-If data for systems measured at different experimental conditions is added, these carry integer suffixes `_1`. Currently, these files are not present in the database, but an example would look like:
-- `1_CPL.csv` - e.g. measurement in Tol
-- `1_CPL_1.csv` - e.g. measurement in CHex
+If data for systems measured at different experimental conditions is added, these carry integer suffixes `_<int>`. 
+An example is provided in `data/spectra/25`:
+- `25_LUM.csv` - measurement in toluene at 293.15 K
+- `25_LUM_1.csv` - measurement in toluene at 77 K
+etc.
 
 ## Running Tests
 
-Simply install the dependencies in a virtual environment, and run the tests with `pytest`:
+We provide a small suite of python tests, mostly ensure that additions to the repository are properly formatted and contain all relevant information.  
+You can install the dependencies in a virtual environment, and run the tests with `pytest`:
 ```bash
 python3 -m venv .venv 
 source .venv/bin/activate
@@ -135,27 +138,13 @@ python3 -m pytest tests -v
 | 51 | [mol 1](https://pubs.rsc.org/en/content/articlelanding/2015/ra/c4ra11488d) |
 | 52 | mol 2 |
 | 53 | mol 3 |
-| 54 | [mol 1](https://www.mdpi.com/1420-3049/23/10/2606) scale w 1e-3 |
-| 55 | mol 2, scale w 1e-3 | 
-| 56 |mol 3, scale with 1e-3 | 
-| 57 | mol 4, scale with 1e-3 | 
-| 58 | Ph3, scale with 1e-3
+| 58 | [Ph3]((https://www.mdpi.com/1420-3049/23/10/2606) ), scale with 1e-3
 | 59 | 12-CPP, scale with 1e-3 |
 | 60 | FL1-C1, scale with 1e-3 |
 
-# Quicknotes
-- Add tests that check validity of headers provided
-    - within header: zeros are fine, doi has to be present all the time
-- add a function to write out information about the set, eg. a formatted information header per structure
-- Add analysis folder for overlap calculation etc.
-- Add tests that check that all spectra can be parsed
-
-
-
-
 ---
 **NOTE** 
-> Please see Tab. XX in the corresponding publication (G. Feldmann, N. Maser, M. Pauls, C. Bannwarth, *manuscript in preparation*) for additional references.  
+> Please see Tab. XX in the corresponding publication (N. Maser, M. Pauls, G. Feldmann, C. Bannwarth, *manuscript in preparation*) for additional references.  
 ---
 
 ## Contributions
