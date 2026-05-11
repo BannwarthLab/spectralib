@@ -7,7 +7,7 @@ import re
 import numpy as np
 
 from pathlib import Path
-from typing import Tuple, List, Dict, Optional
+from typing import Tuple, List, Dict, Optional, Union
 
 from cpl50.utils import (
     REQUIRED_FIELDS,
@@ -65,6 +65,7 @@ def read_spectrum(path: str) -> Spectrum:
             )
 
     return Spectrum(x=x, y=y, metadata=hdict)
+
 
 
 def _validate_header(header_data: Dict[str, str], filename: Optional[str] = None) -> None:
@@ -214,6 +215,90 @@ def sort_csv_by_x(input_file : str, output_file : str) -> None:
         for row in rows:
             writer.writerow(row)
 
+
+def write_spectrum(
+    spectrum: Spectrum,
+    path: Union[str, Path],
+    overwrite: bool = False,
+) -> None:
+    """Write Spectrum to .csv file including metadata as header.
+    The header order is defined by REQUIRED_FIELDS.
+
+
+    Args:
+        spectrum (Spectrum): Spectrum to write to csv.
+
+        path (str | Path):
+            Output file path.
+
+        overwrite (bool):
+            If False, raises if file already exists.
+
+    Raises:
+        - FileExistsError: If file exists and overwrite=False.
+        - ValueError: If required metadata fields are missing.
+        - ValueError: If metadata validation fails.
+    """
+
+    path = Path(path)
+
+    if path.exists() and not overwrite:
+        raise FileExistsError(
+            f"File already exists: {path}"
+        )
+
+    # ------------------------------------------------------------------
+    # Validate metadata
+    # ------------------------------------------------------------------
+
+    missing = [
+        field for field in REQUIRED_FIELDS
+        if field not in spectrum.metadata
+    ]
+
+    if missing:
+        raise ValueError(
+            f"Spectrum metadata missing required fields: {missing}"
+        )
+
+    # preserve exact header ordering
+    # hdict = {
+    #     field: str(spectrum.metadata[field])
+    #     for field in REQUIRED_FIELDS
+    # }
+
+    _validate_header(spectrum.metadata)
+
+    # ------------------------------------------------------------------
+    # Build header line
+    # ------------------------------------------------------------------
+
+    header = ",".join(
+        str(spectrum.metadata[field]).strip()
+        for field in REQUIRED_FIELDS
+    )
+
+    # ------------------------------------------------------------------
+    # Build data block
+    # ------------------------------------------------------------------
+
+    data = np.column_stack((spectrum.x, spectrum.y))
+
+    # ------------------------------------------------------------------
+    # Write file
+    # ------------------------------------------------------------------
+
+    with open(path, "w", newline="\n") as f:
+
+        # write header manually
+        f.write(header + "\n")
+
+        # append numeric block
+        np.savetxt(
+            f,
+            data,
+            delimiter=",",
+        )
 
 def summarize_dataset(spectra_dir: str, select: Optional[List[int]] = None) -> None:
     """Generate formatted printout of all spectra in dataset directory.
