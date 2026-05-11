@@ -137,28 +137,22 @@ python3 -m pytest tests -v
 | 39$^{XX}$ | [(P)-(12-8)-[4]CC](https://www.pnas.org/doi/epdf/10.1073/pnas.1717524114) |
 | 40 | [[12]-cpp](https://www.mdpi.com/1420-3049/23/10/2606), scale 1e-3 | 
 | 41 | [ACNP / ACNP@beta-CD](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.1c02013) | 
+| 42 | [(P)-4](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201801908)
+| 43 | [(M)-2](https://www.sciencedirect.com/science/article/pii/S1010603015004414) | 
+| 44 | [(R)-DPHN](https://pubs.rsc.org/en/content/articlepdf/2015/cc/c5cc04105h) | 
+| 45 | [(P)-1](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b00511) | 
+| 46 | [(-)-1](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201603591) | 
+| 47 | [7aa](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201605000) |
+| $^{XX}$48 | [(1R-2R)-1](https://pubs.rsc.org/en/content/articlehtml/2016/sc/c6sc01808d) |
+| 49 | [(R)-1](https://pubs.acs.org/doi/full/10.1021/jacs.6b00850) |
+| 50 | [(S)-BN-CF](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/adfm.201800051), scale 1e-4 |
+| 51 | [(+)-1](https://pubs.acs.org/doi/full/10.1021/acs.orglett.7b02337) | 
+| 52 | [(R)-T4-BT2](https://pubs.acs.org/doi/full/10.1021/jp504307v) | 
 
 
 
 XX: No luminescence
 ** change ordering
-
-
-
-| Index | Reference |
-|------|-------|
-| 1 | [Mol 2](https://www.sciencedirect.com/science/article/pii/S1010603015004414) |
-| 11 | [Nur 1](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b00511) |
-| 21 | [mol 1, Fig. 3](https://pubs.rsc.org/en/content/articlehtml/2016/sc/c6sc01808d) |
-| 22 | [mol 10](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201801908) |
-| 23 | [schema 1](https://pubs.acs.org/doi/full/10.1021/jp504307v) |
-| 25 | [CPF TADF mol](https://pubs.rsc.org/en/content/articlepdf/2015/cc/c5cc04105h) |
-| 26 | [CPL TADF mol 1](https://pubs.acs.org/doi/full/10.1021/jacs.6b00850) |
-| 31 | Data needs to be scaled by 1e-4 [TADF mol](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/adfm.201800051) |
-| 38 | [mol 1](https://pubs.acs.org/doi/full/10.1021/acs.orglett.7b02337) |
-| 45 | [mol 1 protonated](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201603591) |
-| 50 | [mol 7aa](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201605000) |
-| 60 | FL1-C1, scale with 1e-3 |
 
 ---
 **NOTE** 
