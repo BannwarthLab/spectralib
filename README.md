@@ -108,6 +108,13 @@ python3 -m pytest tests -v
 | 10 | [(1R-4R)-1](https://onlinelibrary.wiley.com/doi/epdf/10.1002/chir.22176)
 | 11 | (1R)-(4) |
 | 12 | (1S-4S)-5 | 
+| 13 | [(S)-1](https://doi.org/10.1002/asia.201200725) |
+| 14 | (S)-2 | 
+| 15 | [(R)-3](https://doi.org/10.1039/C4RA11488D) | 
+| 16 | (R)-1 |
+| 17 | (R)-2 | 
+| 18 | [(R)-1](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201702143) | 
+| 19 | (RRR)-2 | 
 
 
 
@@ -115,7 +122,6 @@ python3 -m pytest tests -v
 | Index | Reference |
 |------|-------|
 | 1 | [Mol 2](https://www.sciencedirect.com/science/article/pii/S1010603015004414) |
-| 9,10  | [(S)-1 and -2](https://doi.org/10.1002/asia.201200725) |
 | 11 | [Nur 1](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b00511) |
 | 12 | [$\Delta_\mathrm{Ir}-\mathbf{A}$](https://onlinelibrary.wiley.com/doi/epdf/10.1002/anie.201704263) |
 | 14 | [system 3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/cptc.201700106) |
@@ -136,8 +142,6 @@ python3 -m pytest tests -v
 | 33 | [molecular assembly cpf](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.1c02013) |
 | 34 | [3PhC](https://pubs.rsc.org/en/content/articlelanding/2015/tc/c4tc02339k) |
 | 35 | No Lum given! [Fig. 4 spec](https://www.pnas.org/doi/epdf/10.1073/pnas.1717524114) |
-| 36 | [(R)-1](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201702143) |
-| 37 | (R,R,R)-2 |
 | 38 | [mol 1](https://pubs.acs.org/doi/full/10.1021/acs.orglett.7b02337) |
 | 39 | [(+)-(12,4)BBBB-[4]CAn2,6](https://onlinelibrary.wiley.com/doi/full/10.1002/ange.201909401)|
 | 42 | [Mol C3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201402930) |
@@ -148,9 +152,6 @@ python3 -m pytest tests -v
 | 47 | [mol 1c](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b01087) |
 | 48 | [mol 1](https://pubs.acs.org/doi/10.1021/acs.orglett.6b00747) |
 | 50 | [mol 7aa](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201605000) |
-| 51 | [mol 1](https://pubs.rsc.org/en/content/articlelanding/2015/ra/c4ra11488d) |
-| 52 | mol 2 |
-| 53 | mol 3 |
 | 59 | 12-CPP, scale with 1e-3 |
 | 60 | FL1-C1, scale with 1e-3 |
 
