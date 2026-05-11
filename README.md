@@ -120,7 +120,21 @@ python3 -m pytest tests -v
 | 22 | [(P-P)-8b](https://pubs.acs.org/doi/full/10.1021/jacs.7b06848)
 | ***23 | [(+)-6](https://pubs.acs.org/doi/full/10.1021/ja300278e) | 
 | 24 | [(+)-(M)-1c](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b01087) | 
-| 25 | [(p)-(+)-1](https://pubs.acs.org/doi/10.1021/acs.orglett.6b00747)
+| 25 | [(p)-(+)-1](https://pubs.acs.org/doi/10.1021/acs.orglett.6b00747) | 
+| 26 | [(aS)-1](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201602684) | 
+| 27 | [(P)-3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/cptc.201700106) 
+| 28 | [(R)-1](https://pubs.acs.org/doi/full/10.1021/ja412294s) | 
+| 29 | [(P)-TTBrM](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.202000098) | 
+| 30 | [(P)-TTBrM-Cz](https://chemrxiv.org/doi/full/10.26434/chemrxiv.10001626/v1) | 
+| 31 | [2](https://www.sciencedirect.com/science/article/pii/S0021967316306501)  | 
+| 32 | [delta_Ir-A](https://onlinelibrary.wiley.com/doi/epdf/10.1002/anie.201704263) | 
+| 33 | [(+)-Rp](https://pubs.acs.org/doi/full/10.1021/acs.orglett.8b02995), scale 1e-3 |
+| 34 | [(R)-9](https://pubs.acs.org/doi/full/10.1021/jacs.7b05671), scale 1e-3 |
+| 35 | [(Sp)-5](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/ejoc.201501181)  | 
+| 36 | [(Sp)-C3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201402930) |
+| 37 | [(Rp)-3PhC](https://pubs.rsc.org/en/content/articlelanding/2015/tc/c4tc02339k) | 
+
+
 
 
 
@@ -129,29 +143,20 @@ python3 -m pytest tests -v
 |------|-------|
 | 1 | [Mol 2](https://www.sciencedirect.com/science/article/pii/S1010603015004414) |
 | 11 | [Nur 1](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b00511) |
-| 12 | [$\Delta_\mathrm{Ir}-\mathbf{A}$](https://onlinelibrary.wiley.com/doi/epdf/10.1002/anie.201704263) |
-| 14 | [system 3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/cptc.201700106) |
-| 15 | [system 1](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201602684) |
-| 18 | [Iridium Complex](https://www.sciencedirect.com/science/article/pii/S0021967316306501) |
 
 | 21 | [mol 1, Fig. 3](https://pubs.rsc.org/en/content/articlehtml/2016/sc/c6sc01808d) |
 | 22 | [mol 10](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201801908) |
 | 23 | [schema 1](https://pubs.acs.org/doi/full/10.1021/jp504307v) |
 | 25 | [CPF TADF mol](https://pubs.rsc.org/en/content/articlepdf/2015/cc/c5cc04105h) |
 | 26 | [CPL TADF mol 1](https://pubs.acs.org/doi/full/10.1021/jacs.6b00850) |
-| 27 | [CPL TADF mol 1, BODIPY](https://pubs.acs.org/doi/full/10.1021/ja412294s) |
-| 28 | [Chiral TTM Radical](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.202000098) |
-| 29 | [TTMCz kuehne](https://chemrxiv.org/doi/full/10.26434/chemrxiv.10001626/v1) |
 | 31 | Data needs to be scaled by 1e-4 [TADF mol](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/adfm.201800051) |
-| 32 | Scale cpl 1e-3 [Cyclophane](https://pubs.acs.org/doi/full/10.1021/acs.orglett.8b02995) |
+
 | 33 | [molecular assembly cpf](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.1c02013) |
-| 34 | [3PhC](https://pubs.rsc.org/en/content/articlelanding/2015/tc/c4tc02339k) |
 | 35 | No Lum given! [Fig. 4 spec](https://www.pnas.org/doi/epdf/10.1073/pnas.1717524114) |
 | 38 | [mol 1](https://pubs.acs.org/doi/full/10.1021/acs.orglett.7b02337) |
 | 39 | [(+)-(12,4)BBBB-[4]CAn2,6](https://onlinelibrary.wiley.com/doi/full/10.1002/ange.201909401)|
-| 42 | [Mol C3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201402930) |
-| 43 | [mol 5](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/ejoc.201501181) |
-| 44 | [mol 9](https://pubs.acs.org/doi/full/10.1021/jacs.7b05671) scale 1e-3 |
+
+
 | 45 | [mol 1 protonated](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201603591) |
 | 50 | [mol 7aa](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201605000) |
 | 59 | 12-CPP, scale with 1e-3 |
