@@ -103,7 +103,11 @@ python3 -m pytest tests -v
 | 5 | [(P-P-1)](https://pubs.acs.org/doi/full/10.1021/acs.joc.9b00389) + [Correction](https://pubs.acs.org/doi/10.1021/acs.joc.9b01513) |
 | 6 | (P-P)-1*2H^+ 2OTf^- | 
 | 7  | (P-P)-1*Zn(OAc)2 | 
-
+| 8 | [Ph3]((https://www.mdpi.com/1420-3049/23/10/2606) ), scale with 1e-3 | 
+| 9 | FL1-C1, scale with 1e-3 |
+| 10 | [(1R-4R)-1](https://onlinelibrary.wiley.com/doi/epdf/10.1002/chir.22176)
+| 11 | (1R)-(4) |
+| 12 | (1S-4S)-5 | 
 
 
 
@@ -116,7 +120,6 @@ python3 -m pytest tests -v
 | 12 | [$\Delta_\mathrm{Ir}-\mathbf{A}$](https://onlinelibrary.wiley.com/doi/epdf/10.1002/anie.201704263) |
 | 14 | [system 3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/cptc.201700106) |
 | 15 | [system 1](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201602684) |
-| 16,17 | [System 1 und 5](https://onlinelibrary.wiley.com/doi/epdf/10.1002/chir.22176) |
 | 18 | [Iridium Complex](https://www.sciencedirect.com/science/article/pii/S0021967316306501) |
 | 19,20 | [Fig. S6 in SI](https://pubs.acs.org/doi/full/10.1021/ja300278e) |
 | 21 | [mol 1, Fig. 3](https://pubs.rsc.org/en/content/articlehtml/2016/sc/c6sc01808d) |
@@ -148,7 +151,6 @@ python3 -m pytest tests -v
 | 51 | [mol 1](https://pubs.rsc.org/en/content/articlelanding/2015/ra/c4ra11488d) |
 | 52 | mol 2 |
 | 53 | mol 3 |
-| 58 | [Ph3]((https://www.mdpi.com/1420-3049/23/10/2606) ), scale with 1e-3
 | 59 | 12-CPP, scale with 1e-3 |
 | 60 | FL1-C1, scale with 1e-3 |
 
