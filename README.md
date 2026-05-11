@@ -3,13 +3,13 @@
 [![License](https://img.shields.io/badge/License-CC%20BY%20SA%204.0-lightgrey)](https://creativecommons.org/licenses/by/4.0/)
 [![Repository](https://img.shields.io/badge/Repository-RWTH%20Aachen-blue)](https://git.rwth-aachen.de/bannwarthlab/cpl50)
 
-![Lewis Structures](./structures2.png)
+![Lewis Structures](./structures_sorted.png)
 
 This project contains: 
 - Experimental luminescence (`data/spectra/*LUM.csv`) and CPL (`data/spectra/*CPL.csv`) spectra.
 - Molecular structures (`data/structures/*.xyz`) in xyz format.
 
-
+---
 # File Description
 Each `.csv` file contains a 1-line header with information about the experiments in the format:
 
@@ -91,6 +91,7 @@ pip install -e ."[test]"
 python3 -m pytest tests -v
 ```
 
+--- 
 
 # Overview of Existing Data
 
@@ -103,8 +104,8 @@ python3 -m pytest tests -v
 | 5 | [(P-P-1)](https://pubs.acs.org/doi/full/10.1021/acs.joc.9b00389) + [Correction](https://pubs.acs.org/doi/10.1021/acs.joc.9b01513) |
 | 6 | (P-P)-1*2H^+ 2OTf^- | 
 | 7  | (P-P)-1*Zn(OAc)2 | 
-| 8 | [Ph3]((https://www.mdpi.com/1420-3049/23/10/2606) ), scale with 1e-3 | 
-| 9 | FL1-C1, scale with 1e-3 |
+| 8 | [Ph3](https://www.mdpi.com/1420-3049/23/10/2606) | 
+| 9 | FL1-C1 |
 | 10 | [(1R-4R)-1](https://onlinelibrary.wiley.com/doi/epdf/10.1002/chir.22176)
 | 11 | (1R)-(4) |
 | 12 | (1S-4S)-5 | 
@@ -117,8 +118,8 @@ python3 -m pytest tests -v
 | 19 | (RRR)-2 | 
 | 20 | [(M)-1c](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201604398) |
 | 21 | [(+)-4](https://pubs.acs.org/doi/full/10.1021/ja300278e) | 
-| 22 | [(P-P)-8b](https://pubs.acs.org/doi/full/10.1021/jacs.7b06848)
-| ***23 | [(+)-6](https://pubs.acs.org/doi/full/10.1021/ja300278e) | 
+| 22 | (+)-6 | 
+| 23 | [(P-P)-8b](https://pubs.acs.org/doi/full/10.1021/jacs.7b06848)
 | 24 | [(+)-(M)-1c](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b01087) | 
 | 25 | [(p)-(+)-1](https://pubs.acs.org/doi/10.1021/acs.orglett.6b00747) | 
 | 26 | [(aS)-1](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201602684) | 
@@ -128,14 +129,14 @@ python3 -m pytest tests -v
 | 30 | [(P)-TTBrM-Cz](https://chemrxiv.org/doi/full/10.26434/chemrxiv.10001626/v1) | 
 | 31 | [2](https://www.sciencedirect.com/science/article/pii/S0021967316306501)  | 
 | 32 | [delta_Ir-A](https://onlinelibrary.wiley.com/doi/epdf/10.1002/anie.201704263) | 
-| 33 | [(+)-Rp](https://pubs.acs.org/doi/full/10.1021/acs.orglett.8b02995), scale 1e-3 |
-| 34 | [(R)-9](https://pubs.acs.org/doi/full/10.1021/jacs.7b05671), scale 1e-3 |
+| 33 | [(+)-Rp](https://pubs.acs.org/doi/full/10.1021/acs.orglett.8b02995) |
+| 34 | [(R)-9](https://pubs.acs.org/doi/full/10.1021/jacs.7b05671) |
 | 35 | [(Sp)-5](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/ejoc.201501181)  | 
 | 36 | [(Sp)-C3](https://chemistry-europe.onlinelibrary.wiley.com/doi/epdf/10.1002/chem.201402930) |
 | 37 | [(Rp)-3PhC](https://pubs.rsc.org/en/content/articlelanding/2015/tc/c4tc02339k) | 
 | 38 | [(+)-(12-4)BBBB-[4]CAn2-6](https://onlinelibrary.wiley.com/doi/full/10.1002/ange.201909401) | 
-| 39$^{XX}$ | [(P)-(12-8)-[4]CC](https://www.pnas.org/doi/epdf/10.1073/pnas.1717524114) |
-| 40 | [[12]-cpp](https://www.mdpi.com/1420-3049/23/10/2606), scale 1e-3 | 
+| $^{A}$39 | [(P)-(12-8)-[4]CC](https://www.pnas.org/doi/epdf/10.1073/pnas.1717524114) |
+| 40 | [[12]-cpp](https://www.mdpi.com/1420-3049/23/10/2606) | 
 | 41 | [ACNP / ACNP@beta-CD](https://pubs.acs.org/doi/full/10.1021/acs.jpclett.1c02013) | 
 | 42 | [(P)-4](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201801908)
 | 43 | [(M)-2](https://www.sciencedirect.com/science/article/pii/S1010603015004414) | 
@@ -143,26 +144,26 @@ python3 -m pytest tests -v
 | 45 | [(P)-1](https://pubs.acs.org/doi/full/10.1021/acs.joc.7b00511) | 
 | 46 | [(-)-1](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201603591) | 
 | 47 | [7aa](https://chemistry-europe.onlinelibrary.wiley.com/doi/full/10.1002/chem.201605000) |
-| $^{XX}$48 | [(1R-2R)-1](https://pubs.rsc.org/en/content/articlehtml/2016/sc/c6sc01808d) |
+| $^{A}$48 | [(1R-2R)-1](https://pubs.rsc.org/en/content/articlehtml/2016/sc/c6sc01808d) |
 | 49 | [(R)-1](https://pubs.acs.org/doi/full/10.1021/jacs.6b00850) |
-| 50 | [(S)-BN-CF](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/adfm.201800051), scale 1e-4 |
+| 50 | [(S)-BN-CF](https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/adfm.201800051) |
 | 51 | [(+)-1](https://pubs.acs.org/doi/full/10.1021/acs.orglett.7b02337) | 
 | 52 | [(R)-T4-BT2](https://pubs.acs.org/doi/full/10.1021/jp504307v) | 
 
-
-
-XX: No luminescence
-** change ordering
+A: No luminescence spectra available.
 
 ---
-**NOTE** 
-> Please see Tab. XX in the corresponding publication (N. Maser, M. Pauls, G. Feldmann, C. Bannwarth, *manuscript in preparation*) for additional references.  
+## How to Cite
+> Please see the corresponding publication (N. Maser, M. Pauls, G. Feldmann, C. Bannwarth, *manuscript in preparation*) for additional information.  
 ---
 
-## Contributions
+## Contributors
 
-*Add description on how to add data*
+- [Mike Pauls](pauls@pc.rwth-aachen.de)
+- Nicole Maser
 
-## Contact
+---
+## How to Contribute
 
-Mike Pauls, pauls@pc.rwth-aachen.de
+> We encourage you to complement and extend this dataset. To do so, just create an issue on GitLab and ensure that your data passes the tests - that's it! 
+
