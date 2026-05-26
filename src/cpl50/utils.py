@@ -129,6 +129,7 @@ REQUIRED_FIELDS = ["DOI", "molname", "T", "c", "solv", "irrad", "quant", "unit"]
 # -----  Registry of valid keys within the header in CPL50  ----- #
 DOI_REGEX = re.compile(r'^10\.\d{4,9}/[-._;()/:A-Z0-9]+$', re.IGNORECASE)
 
+
 VALID_SOLVENTS = {
     "meoh",   # methanol
     "ch3oh",  
@@ -151,6 +152,63 @@ VALID_SOLVENTS = {
     "me-chex",
     #"0",      # allow missing value
 }
+
+
+SOLVENT_ALIASES = {
+    # methanol
+    "meoh": "methanol",
+    "ch3oh": "methanol",
+    # ethanol
+    "etoh": "ethanol",
+    # water
+    "h2o": "water",
+    # acetonitrile
+    "mecn": "acetonitrile",
+    # toluene
+    "tol": "toluene",
+    "toluene": "toluene",
+    # dichloromethane
+    "dcm": "dichloromethane",
+    "ch2cl2": "dichloromethane",
+    # chloroform
+    #"chloroform": "chloroform",
+    "chcl3": "chloroform",
+    # dioxane
+    "p-dioxane": "p-dioxane",
+    "1-4-dioxane": "p-dioxane",
+    # cyclohexane
+    "chex": "cyclohexane",
+    "cyclohexane": "cyclohexane",
+    # carbon tetrachloride
+    "ccl4": "carbon tetrachloride",
+    # direct names
+    "hexane": "hexane",
+    "dmf": "dmf",
+}
+
+DIELECTRIC_CONSTANTS = { # https://comp.chem.umn.edu/solvation/mnsddb.pdf
+    "carbon tetrachloride" : 2.2280,
+    "dichloromethane" : 8.93, 
+    "chloroform" : 4.7113,
+    "cyclohexane" : 2.0165,
+    "ethanol" : 24.852,
+    "methanol" : 32.613,
+    "p-dioxane" : 2.2099,
+    "toluene" : 2.3741, 
+}
+
+def canonicalize_solvent(solvent: str) -> str:
+    """
+    Convert solvent alias to canonical name.
+    """
+
+    s = solvent.lower().strip()
+
+    if s not in SOLVENT_ALIASES:
+        raise ValueError(f"Unknown solvent alias: {solvent}")
+
+    return SOLVENT_ALIASES[s]
+
 
 VALID_QUANT_CP = {
     "cpl",
