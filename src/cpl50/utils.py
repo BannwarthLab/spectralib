@@ -10,6 +10,9 @@ from typing import Dict, Optional
 
 EN_UNITS = {"nm", "ev", "cm-1"}
 
+# Energy conversion constant: hc in eV*nm (for E(eV) * λ(nm) conversions)
+NM_TO_EV_CM = sc.h * sc.c * 1e9 / sc.e
+
 _NM_TO = {
     "nm"  : lambda x: x,
     "ev"  : lambda x: (sc.h * sc.c * 1e9) / (x * sc.e),
