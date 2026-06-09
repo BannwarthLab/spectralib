@@ -21,6 +21,7 @@ RMSD_DUPLICATE_THRESHOLD = 0.1  # Å — pairs below this are flagged as duplica
 def all_structures():
     data_dir = Path(__file__).resolve().parents[1] / "data" / "structures"
     files = sorted(data_dir.rglob("*.xyz"))
+    files = [f for f in files if f.name != "all.xyz"]
     assert files, "No .xyz files found in data/structures"
     return [(f, *read_xyz(str(f))) for f in files]
 

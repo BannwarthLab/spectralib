@@ -396,7 +396,7 @@ def load_dataset_metadata(
 # ---------------------------------------------------------------------
 
 def summarize_dataset(
-    records: List[Dict[str, Any]],
+    records: Union[str, Path, List[Dict[str, Any]]],
     columns: Optional[List[str]] = None,
 ) -> None:
     """
@@ -404,11 +404,15 @@ def summarize_dataset(
 
     Args:
         records:
-            Output from load_dataset_metadata()
+            Either a path to a spectra directory or the output from
+            load_dataset_metadata().
 
         columns:
             Columns to display.
     """
+
+    if isinstance(records, (str, Path)):
+        records = load_dataset_metadata(str(records))
 
     COLS = {
         "file":   {"title": "File",       "width": 20},
