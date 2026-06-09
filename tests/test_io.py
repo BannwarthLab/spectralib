@@ -168,4 +168,4 @@ def test_summary_sentinel_displayed_as_dash(tmp_path, capsys):
 
 def test_summary_empty_directory(tmp_path, capsys):
     summarize_dataset(str(tmp_path))
-    assert "0 file(s)" in capsys.readouterr().out
+    assert "0 records" in capsys.readouterr().out
