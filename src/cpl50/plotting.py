@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import matplotlib.pyplot as plt
 import numpy as np
+from tcgm_unitkit import convert_energy_unit
 
 from cpl50.spectrum import Spectrum
-from cpl50.units import convert_x
 
 _XLABEL = {"ev": "Energy / eV", "cm-1": r"Wavenumber / cm$^{-1}$", "nm": "Wavelength / nm"}
 
@@ -37,7 +37,7 @@ def add_wavelength_axis(ax: plt.Axes) -> plt.Axes:
         x = np.asarray(x, dtype=float)
         out = np.full_like(x, np.inf)
         ok = x > 0
-        out[ok] = convert_x(x[ok], "ev", "nm")
+        out[ok] = convert_energy_unit(x[ok], "ev", "nm")  # x[ok] is already a copy
         return out
 
     sec = ax.secondary_xaxis("top", functions=(f, f))

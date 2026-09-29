@@ -4,8 +4,17 @@ from __future__ import annotations
 
 import numpy as np
 from scipy.integrate import trapezoid
+from tcgm_unitkit import convert_energy_unit
 
-from cpl50.units import X_UNITS, convert_x, x_jacobian
+#: Energy-axis units (tcgm_unitkit spelling).
+X_UNITS = ("nm", "ev", "cm-1")
+
+
+def _jacobian(x: np.ndarray, init: str, final: str) -> np.ndarray:
+    """|dx_init/dx_final| at x (init units) up to a constant: x^2 for nm -> energy, x^-2 for energy -> nm."""
+    if (init == "nm") == (final == "nm"):
+        return np.ones_like(x)
+    return x**2 if init == "nm" else 1.0 / x**2
 
 
 class Spectrum:
@@ -44,8 +53,11 @@ class Spectrum:
                 not for epsilon, delta-epsilon or g_lum.
         """
         final = final.lower()
-        x_new = convert_x(self.x, self.xunit, final)
-        y_new = self.y * x_jacobian(self.x, self.xunit, final) if jacobian else self.y.copy()
+        if final not in X_UNITS:
+            raise ValueError(f"Unknown xunit '{final}'. Choose from {X_UNITS}.")
+        # copy: convert_energy_unit overwrites arrays in place for nm <-> energy
+        x_new = convert_energy_unit(self.x.copy(), self.xunit, final)
+        y_new = self.y * _jacobian(self.x, self.xunit, final) if jacobian else self.y.copy()
         order = np.argsort(x_new)
         return self._new(x_new[order], y_new[order], final)
 

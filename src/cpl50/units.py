@@ -1,7 +1,6 @@
-"""Unit conversions and spectroscopic prefactors.
+"""Spectroscopic prefactors built from the ``tcgm_unitkit`` physical constants.
 
-Energy-axis conversions are delegated to ``tcgm_unitkit.convert_energy_unit``;
-physical constants are taken from ``tcgm_unitkit.constants.physical_constants``.
+Energy-axis conversions use ``tcgm_unitkit.convert_energy_unit`` directly.
 
 Conventions for transition quantities:
     f    oscillator strength (dimensionless)
@@ -24,9 +23,6 @@ from tcgm_unitkit.constants.physical_constants import (
     SPEED_OF_LIGHT,
     VACUUM_PERMITTIVITY,
 )
-
-#: Energy-axis units understood by the Spectrum class (tcgm_unitkit spelling).
-X_UNITS = ("nm", "ev", "cm-1")
 
 _LN10 = np.log(10.0)
 
@@ -57,59 +53,13 @@ K_DEPS = 32.0 * PI**3 * AVOGADRO_CONSTANT / (3000.0 * _LN10 * _H_CGS * _C_CGS)
 K_EPS_D = K_DEPS / 4.0
 
 
-def convert_x(x: np.ndarray | float, init: str, final: str) -> np.ndarray:
-    """Convert energy-axis values between 'nm', 'ev' and 'cm-1'.
-
-    Thin guard around ``tcgm_unitkit.convert_energy_unit``: validates the unit names
-    (unitkit returns the input unchanged for unknown units), always passes a float
-    copy (unitkit modifies arrays in place for reciprocal conversions) and rejects
-    zeros for reciprocal conversions (unitkit leaves them at 0 instead of inf).
-
-    Returns:
-        np.ndarray: Converted values (0-d array for scalar input).
-    """
-    init, final = init.lower(), final.lower()
-    for u in (init, final):
-        if u not in X_UNITS:
-            raise ValueError(f"Unknown x unit '{u}'. Choose from {X_UNITS}.")
-    arr = np.array(x, dtype=float)  # always a copy
-    if init == final:
-        return arr
-    if ("nm" in (init, final)) and np.any(arr == 0):
-        raise ValueError("Cannot convert 0 between wavelength and energy.")
-    out = convert_energy_unit(arr.reshape(-1), init, final)
-    return np.asarray(out, dtype=float).reshape(arr.shape)
-
-
-def x_jacobian(x: np.ndarray, init: str, final: str) -> np.ndarray:
-    """|d x_init / d x_final| evaluated at x (given in ``init`` units).
-
-    Needed to transform spectral *densities* (emission I, CPL delta I measured per
-    wavelength interval) between axes: y_final = y_init * |dx_init/dx_final|.
-    For nm <-> energy this is lambda^2 / (hc) up to a constant, i.e. proportional to x_init^2
-    (nm -> energy) or 1/x_init^2 (energy -> nm). Constant factors are dropped because
-    they cancel under normalisation; only the shape-relevant part is returned.
-    Linear conversions (ev <-> cm-1) return ones.
-    """
-    init, final = init.lower(), final.lower()
-    x = np.asarray(x, dtype=float)
-    if (init == "nm") == (final == "nm"):
-        return np.ones_like(x)
-    return x**2 if init == "nm" else 1.0 / x**2
-
-
-def ev_to_cm1_factor() -> float:
-    """cm^-1 per eV (linear factor, used for widths)."""
-    return float(convert_x(1.0, "ev", "cm-1"))
-
-
 def osc_to_dipole_strength(energy_ev: np.ndarray, f: np.ndarray) -> np.ndarray:
     """Dipole strength D in 1e-40 esu^2 cm^2 from oscillator strength.
 
     D = 3 h e^2 f / (8 pi^2 m_e c nu)   (cgs, nu in cm^-1)
     equivalently D[a.u.] = 3 f / (2 dE[Eh]).
     """
-    nu = convert_x(energy_ev, "ev", "cm-1")
+    nu = convert_energy_unit(np.array(energy_ev, dtype=float), "ev", "cm-1")
     d = 3.0 * _H_CGS * _E_ESU**2 * np.asarray(f, dtype=float) / (8.0 * PI**2 * _ME_CGS * _C_CGS * nu)
     return d / CGS40
 

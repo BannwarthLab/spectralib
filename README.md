@@ -85,28 +85,35 @@ etc.
 | Module | Content |
 |---|---|
 | `spectrum` | `Spectrum` (x, y, unit, header metadata): unit conversion (optionally with Jacobian), shift, crop, normalisation, interpolation |
-| `units` | Energy-axis conversion via [`tcgm_unitkit`](https://gitlab.git.nrw/rwth-bannwarthlab/utils/tcgm_unitkit); prefactors for $\varepsilon$ and $\Delta\varepsilon$; $f\rightarrow D$; $g = 4R/D$ |
+| `units` | Prefactors for $\varepsilon$ and $\Delta\varepsilon$ from the [`tcgm_unitkit`](https://gitlab.git.nrw/rwth-bannwarthlab/utils/tcgm_unitkit) constants; $f\rightarrow D$; $g = 4R/D$ (axis conversions use `tcgm_unitkit.convert_energy_unit`) |
 | `broadening` | Gaussian/Lorentzian broadening (FWHM), ensemble averaging of sticks, $\varepsilon$ and $\Delta\varepsilon$ in L mol$^{-1}$ cm$^{-1}$, emission profiles |
 | `metrics` | Cosine similarity, lobe-resolved cosines, $E_\mathrm{spe}$, $E_\mathrm{ene}$, optimal shift, main-band sign, `benchmark` |
-| `io`, `io_orca` | Dataset parsers/validation, `.CHRG`/`.UHF`, ORCA TDDFT tables (ORCA 5 and 6) |
+| `io` | Dataset parsers/validation, `.CHRG`/`.UHF` |
 | `plotting` | Matplotlib helpers (`pip install -e ".[plot]"`) |
+
+The library works on plain arrays (energies in eV, $f$, $R$ in $10^{-40}$ esu$^2$ cm$^2$). Quantum-chemistry
+output is read with [`tcgmio`](https://gitlab.git.nrw/rwth-bannwarthlab/utils/tcgmio), which is not a dependency of `cpl50`.
 
 ```python
 import numpy as np
-from cpl50 import read_spectrum, read_orca_tddft
+from tcgmio.orca import ORCAOutputHandler, read_orca_rotatory_strengths  # the latter: pending in tcgmio
+
+from cpl50 import read_spectrum
 from cpl50.broadening import delta_epsilon_spectrum, emission_spectrum, epsilon_spectrum
 from cpl50.metrics import benchmark
 from cpl50.units import osc_to_dipole_strength
 
-grid = np.linspace(1.5, 6.0, 2000)                                      # eV
-tab  = read_orca_tddft("orca.out")                                      # energy [eV], f_len, r_len [1e-40 cgs], ...
-eps  = epsilon_spectrum(tab["energy"], tab["f_len"], grid, fwhm=0.3)          # L mol-1 cm-1
-deps = delta_epsilon_spectrum(tab["energy"], tab["r_len"], grid, fwhm=0.3)    # L mol-1 cm-1
+grid = np.linspace(1.5, 6.0, 2000)                                   # eV
+tr   = ORCAOutputHandler("calc/").electronic_transition
+e, f = tr.excitation_energies, tr.oscillator_strengths               # eV, dimensionless
+r    = read_orca_rotatory_strengths("calc/orca.out")                  # 1e-40 esu^2 cm^2
+eps  = epsilon_spectrum(e, f, grid, fwhm=0.3)                         # L mol-1 cm-1
+deps = delta_epsilon_spectrum(e, r, grid, fwhm=0.3)                   # L mol-1 cm-1
 
 # emission at the S1 geometry: LUM ~ E^3 D, CPL ~ E^3 4R  (ratio -> g_lum)
-d1  = osc_to_dipole_strength(tab["energy"][:1], tab["f_len"][:1])
-lum = emission_spectrum(tab["energy"][:1], d1, grid, fwhm=0.35)
-cpl = emission_spectrum(tab["energy"][:1], 4 * tab["r_len"][:1], grid, fwhm=0.35)
+d1  = osc_to_dipole_strength(e[:1], f[:1])
+lum = emission_spectrum(e[:1], d1, grid, fwhm=0.35)
+cpl = emission_spectrum(e[:1], 4 * r[:1], grid, fwhm=0.35)
 
 exp_lum = read_spectrum("data/spectra/12/12_LUM.csv").convert_x("ev", jacobian=True)
 exp_cpl = read_spectrum("data/spectra/12/12_CPL.csv").convert_x("ev", jacobian=True)

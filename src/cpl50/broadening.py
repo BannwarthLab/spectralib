@@ -10,9 +10,10 @@ from __future__ import annotations
 from collections.abc import Iterable
 
 import numpy as np
+from tcgm_unitkit import convert_energy_unit
 
 from cpl50.spectrum import Spectrum
-from cpl50.units import K_DEPS, K_EPS, K_EPS_D, convert_x
+from cpl50.units import K_DEPS, K_EPS, K_EPS_D
 
 _FWHM_PER_SIGMA = 2.0 * np.sqrt(2.0 * np.log(2.0))
 
@@ -72,7 +73,7 @@ def ensemble_sticks(frames: Iterable[tuple[np.ndarray, np.ndarray]]) -> tuple[np
 def _to_cm1(energies: np.ndarray, grid: np.ndarray, fwhm: float, unit: str) -> tuple:
     if unit not in ("ev", "cm-1"):
         raise ValueError("unit must be 'ev' or 'cm-1'")
-    fac = float(convert_x(1.0, unit, "cm-1"))
+    fac = convert_energy_unit(1.0, unit, "cm-1")  # linear, so widths scale the same way
     return np.asarray(energies, dtype=float) * fac, np.asarray(grid, dtype=float) * fac, fwhm * fac
 
 

@@ -4,6 +4,7 @@
 import numpy as np
 import pytest
 from scipy.integrate import trapezoid
+from tcgm_unitkit import convert_energy_unit
 
 from cpl50.broadening import (
     broaden,
@@ -17,7 +18,7 @@ from cpl50.broadening import (
     gaussian,
     lorentzian,
 )
-from cpl50.units import K_EPS, convert_x, osc_to_dipole_strength
+from cpl50.units import K_EPS, osc_to_dipole_strength
 
 GRID = np.linspace(0.5, 8.0, 7501)
 
@@ -54,17 +55,17 @@ def test_ensemble_sticks_weights():
 def test_epsilon_integrates_to_oscillator_strength():
     f = 0.3
     spec = epsilon_spectrum([4.0], [f], GRID, 0.3)
-    nu = convert_x(GRID, "ev", "cm-1")
+    nu = convert_energy_unit(GRID.copy(), "ev", "cm-1")
     assert trapezoid(spec.y, nu) / K_EPS == pytest.approx(f, rel=1e-6)
     # unit independence: same eps on a cm-1 grid
-    spec_cm = epsilon_spectrum(convert_x(4.0, "ev", "cm-1"), [f], nu, 0.3 * convert_x(1.0, "ev", "cm-1"), unit="cm-1")
+    spec_cm = epsilon_spectrum(convert_energy_unit(4.0, "ev", "cm-1"), [f], nu, 0.3 * convert_energy_unit(1.0, "ev", "cm-1"), unit="cm-1")
     assert spec_cm.y == pytest.approx(spec.y)
 
 
 def test_delta_epsilon_rosenfeld_sum_rule():
     r = 100.0  # 1e-40 cgs
     spec = delta_epsilon_spectrum([4.0], [r], GRID, 0.3)
-    nu = convert_x(GRID, "ev", "cm-1")
+    nu = convert_energy_unit(GRID.copy(), "ev", "cm-1")
     assert 2.296e-39 * trapezoid(spec.y / nu, nu) == pytest.approx(r * 1e-40, rel=1e-3)
 
 
