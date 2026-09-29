@@ -1,4 +1,0 @@
-! UKS PBEh-3c sp CPCM(XXXX)
-%pal nprocs 12 end
-%maxcore 1000
-* xyzfile 0 AAAA coord.xyz

@@ -1,8 +1,0 @@
-! UKS PBEh-3c deltascf GMF opt freq CPCM(XXXX)
-! moread
-%moinp "guess.gbw"
-%scf alphaconf 0,1
-end
- %pal nprocs 12 end
-%maxcore 1000
-* xyzfile 0 AAAA coord.xyz
