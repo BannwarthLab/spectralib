@@ -11,10 +11,13 @@ requires-python = ">=3.10"
 dependencies = [
     "numpy",
     "scipy",
+    "tcgm_unitkit @ git+https://gitlab.git.nrw/rwth-bannwarthlab/utils/tcgm_unitkit.git",
 ]
 
 [project.optional-dependencies]
+plot = ["matplotlib"]
 test = [
+    "matplotlib",
     "pytest",
     "pytest-cov",
     "pytest-xdist",
@@ -27,3 +30,6 @@ where = ["src"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+[tool.ruff]
+line-length = 121
+extend-exclude = ["workflows"]  # moved scripts, kept unchanged for discussion

@@ -80,6 +80,65 @@ An example is provided in `data/spectra/25`:
 - `25_LUM_1.csv` - measurement in toluene at 77 K
 etc.
 
+## Python Library (`src/cpl50`)
+
+| Module | Content |
+|---|---|
+| `spectrum` | `Spectrum` (x, y, unit, header metadata): unit conversion (optionally with Jacobian), shift, crop, normalisation, interpolation |
+| `units` | Energy-axis conversion via [`tcgm_unitkit`](https://gitlab.git.nrw/rwth-bannwarthlab/utils/tcgm_unitkit); prefactors for $\varepsilon$ and $\Delta\varepsilon$; $f\rightarrow D$; $g = 4R/D$ |
+| `broadening` | Gaussian/Lorentzian broadening (FWHM), ensemble averaging of sticks, $\varepsilon$ and $\Delta\varepsilon$ in L mol$^{-1}$ cm$^{-1}$, emission profiles |
+| `metrics` | Cosine similarity, lobe-resolved cosines, $E_\mathrm{spe}$, $E_\mathrm{ene}$, optimal shift, main-band sign, `benchmark` |
+| `io`, `io_orca` | Dataset parsers/validation, `.CHRG`/`.UHF`, ORCA TDDFT tables (ORCA 5 and 6) |
+| `plotting` | Matplotlib helpers (`pip install -e ".[plot]"`) |
+
+```python
+import numpy as np
+from cpl50 import read_spectrum, read_orca_tddft
+from cpl50.broadening import delta_epsilon_spectrum, emission_spectrum, epsilon_spectrum
+from cpl50.metrics import benchmark
+from cpl50.units import osc_to_dipole_strength
+
+grid = np.linspace(1.5, 6.0, 2000)                                      # eV
+tab  = read_orca_tddft("orca.out")                                      # energy [eV], f_len, r_len [1e-40 cgs], ...
+eps  = epsilon_spectrum(tab["energy"], tab["f_len"], grid, fwhm=0.3)          # L mol-1 cm-1
+deps = delta_epsilon_spectrum(tab["energy"], tab["r_len"], grid, fwhm=0.3)    # L mol-1 cm-1
+
+# emission at the S1 geometry: LUM ~ E^3 D, CPL ~ E^3 4R  (ratio -> g_lum)
+d1  = osc_to_dipole_strength(tab["energy"][:1], tab["f_len"][:1])
+lum = emission_spectrum(tab["energy"][:1], d1, grid, fwhm=0.35)
+cpl = emission_spectrum(tab["energy"][:1], 4 * tab["r_len"][:1], grid, fwhm=0.35)
+
+exp_lum = read_spectrum("data/spectra/12/12_LUM.csv").convert_x("ev", jacobian=True)
+exp_cpl = read_spectrum("data/spectra/12/12_CPL.csv").convert_x("ev", jacobian=True)
+res_lum = benchmark(exp_lum, lum, signed=False)
+res_cpl = benchmark(exp_cpl, cpl, signed=True, shift=res_lum["shift"])
+```
+
+### Comparing signed spectra (CPL/ECD)
+
+1. **Energy axis.** Compare on an energy axis. Experimental LUM/CPL intensities are densities per wavelength
+   interval; `convert_x("ev", jacobian=True)` multiplies by $\lambda^2$. On this dataset this moves LUM maxima by
+   0.05–0.19 eV (0.54 eV for molecule 7), i.e. by as much as typical method errors. $\varepsilon$, $\Delta\varepsilon$
+   and $g_\mathrm{lum}$ are not densities and are converted without the Jacobian.
+2. **Normalisation.** Experimental CPL is in arbitrary units ($\Delta I$, mdeg), so only shapes can be compared.
+   Normalise sign-preserving: `max` for plots, `area` ($\int|y| = 1$) for metrics, as the peak height depends on the
+   broadening width and on noise spikes.
+3. **Shift.** Take the shift from the unsigned partner spectrum (LUM for CPL, UV-vis for ECD), since both come from
+   the same transitions. Without a partner, align on $|y|$ (`objective="abs_cosine"`), so an energy error cannot be
+   traded against a sign error.
+4. **Main-band sign** (`signs_match`): the sign of the lobe with the larger area, evaluated within the measured
+   window. Report `sign_ratio` $=(A_+-A_-)/(A_++A_-)$ alongside it; a value near 0 means a balanced couplet with no
+   well-defined main band. Of the 52 experimental CPL spectra, only `9_CPL` has $|\text{ratio}| < 0.5$.
+5. **Band shape at that shift.** Signed cosine similarity (1 = identical, −1 = mirror image) and the area-normalised
+   $E_\mathrm{spe} = \int|\sigma^\mathrm{ref}-\sigma|\,/\int|\sigma^\mathrm{ref}|$ (0 = identical, 2 = mirror image or no overlap).
+   The lobe-resolved cosines $(o_+, o_-)$ show which lobe fails.
+6. **Energies.** `peak_error` per molecule (reference smoothed to suppress noise spikes); $E_\mathrm{ene}$ = RMSD over
+   the dataset. With state-resolved theory-vs-theory data, `e_ene(..., match=True)` handles root flipping.
+
+$E_\mathrm{ene}$ and $E_\mathrm{spe}$: Z. Zhou, S. M. Parker, *J. Phys. Chem. Lett.* **2023**, [10.1021/acs.jpclett.2c03698](https://doi.org/10.1021/acs.jpclett.2c03698), Eqs. 11–12.
+There they compare two calculated spectra in the same units over $[0, \omega_\mathrm{max}]$; for that case use
+`e_spe(..., norm=None, window="union")`.
+
 ## Running Tests
 
 We provide a small suite of python tests, mostly ensure that additions to the repository are properly formatted and contain all relevant information.  
@@ -87,7 +146,7 @@ You can install the dependencies in a virtual environment, and run the tests wit
 ```bash
 python3 -m venv .venv 
 source .venv/bin/activate
-pip install -e ."[test]"
+pip install -e ".[test]"   # pulls tcgm_unitkit from gitlab.git.nrw
 python3 -m pytest tests -v
 ```
 

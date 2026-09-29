@@ -2,10 +2,10 @@
 # test_structures.py  –  XYZ structure files + RMSD duplicate detection
 # =============================================================================
 import itertools
+import re
 from pathlib import Path
 
 import numpy as np
-import re
 import pytest
 
 from cpl50.io import read_xyz
