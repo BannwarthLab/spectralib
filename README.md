@@ -96,7 +96,8 @@ output is read with [`tcgmio`](https://gitlab.git.nrw/rwth-bannwarthlab/utils/tc
 
 ```python
 import numpy as np
-from tcgmio.orca import ORCAOutputHandler, read_orca_rotatory_strengths  # the latter: pending in tcgmio
+from tcgm_unitkit import convert_energy_unit
+from tcgmio.orca import read_orca_opa_spectrum
 
 from cpl50 import read_spectrum
 from cpl50.broadening import delta_epsilon_spectrum, emission_spectrum, epsilon_spectrum
@@ -104,9 +105,9 @@ from cpl50.metrics import benchmark
 from cpl50.units import osc_to_dipole_strength
 
 grid = np.linspace(1.5, 6.0, 2000)                                   # eV
-tr   = ORCAOutputHandler("calc/").electronic_transition
-e, f = tr.excitation_energies, tr.oscillator_strengths               # eV, dimensionless
-r    = read_orca_rotatory_strengths("calc/orca.out")                  # 1e-40 esu^2 cm^2
+_, _, e_cm, f, _, _ = read_orca_opa_spectrum("orca.out")             # cm-1, dimensionless
+r    = read_orca_opa_spectrum("orca.out", cd=True)[3]                 # 1e-40 esu^2 cm^2
+e    = convert_energy_unit(e_cm, "cm-1", "ev")
 eps  = epsilon_spectrum(e, f, grid, fwhm=0.3)                         # L mol-1 cm-1
 deps = delta_epsilon_spectrum(e, r, grid, fwhm=0.3)                   # L mol-1 cm-1
 
