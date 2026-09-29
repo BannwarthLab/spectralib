@@ -1,3 +1,5 @@
 __pycache*
 *venv*
 *.egg-info
+_*
+*.sh
