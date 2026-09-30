@@ -1,4 +1,4 @@
-""" Contains parser functions. """
+"""Contains parser functions."""
 
 from __future__ import annotations
 
@@ -23,8 +23,8 @@ from cpl50.utils import (
 
 
 def read_spectrum(path: str) -> Spectrum:
-    """ Read spectrum from .csv file and check for valid header data. 
-    
+    """Read spectrum from .csv file and check for valid header data.
+
     Args:
         path (str): Path to the .csv file.
 
@@ -38,7 +38,7 @@ def read_spectrum(path: str) -> Spectrum:
         ValueError: If the x-axis is not strictly increasing.
     """
 
-    # Parse header line, split and build dict 
+    # Parse header line, split and build dict
     with open(path, "r") as f:
         header = f.readline()
 
@@ -48,7 +48,7 @@ def read_spectrum(path: str) -> Spectrum:
 
     hdict = dict(zip(REQUIRED_FIELDS, parts))
     hdict["file"] = path
-    
+
     # Check validity of entries
     _validate_header(hdict)
 
@@ -61,23 +61,19 @@ def read_spectrum(path: str) -> Spectrum:
     chk = np.diff(x) > 0
     if not np.all(chk):
         failed_lines = np.where(~chk)[0] + 2
-        raise ValueError(
-            f"x-axis must be strictly increasing in {path};" 
-            f"wrong line(s): {failed_lines.tolist()}"
-            )
+        raise ValueError(f"x-axis must be strictly increasing in {path}; wrong line(s): {failed_lines.tolist()}")
 
     return Spectrum(x=x, y=y, metadata=hdict)
 
 
-
 def _validate_header(header_data: dict[str, str]) -> None:
-    """ Check that entries in header are valid for both LUM and CPL files. 
+    """Check that entries in header are valid for both LUM and CPL files.
 
     Args:
-        header_data (dict[str, str]): Parsed header fields. 
-    
+        header_data (dict[str, str]): Parsed header fields.
+
     Returns:
-        None. 
+        None.
 
     Notes:
         Expected keys in header_data:
@@ -123,7 +119,7 @@ def _validate_header(header_data: dict[str, str]) -> None:
         if c <= 0:
             raise ValueError(f"Concentration must be positive in {filename}")
 
-    # Solvent has to be in known solvent 
+    # Solvent has to be in known solvent
     if header_data["solv"].lower() not in VALID_SOLVENTS:
         raise ValueError(f"Invalid solvent '{header_data['solv']}' in {filename}")
 
@@ -139,13 +135,14 @@ def _validate_header(header_data: dict[str, str]) -> None:
             raise ValueError(f"Invalid CPL quantity '{header_data['quant']}' in {filename}")
         if header_data["unit"].lower() not in VALID_UNIT_CP:
             raise ValueError(f"Invalid CPL unit '{header_data['unit']}' in {filename}")
-        
+
     elif "LUM" in fstem:
         if header_data["quant"].lower() not in VALID_QUANT_LUM:
             raise ValueError(f"Invalid LUM quantity '{header_data['quant']}' in {filename}")
         if header_data["unit"].lower() not in VALID_UNIT_LUM:
             raise ValueError(f"Invalid LUM unit '{header_data['unit']}' in {filename}")
-        
+
+
 def read_xyz(file: str) -> tuple[np.ndarray, np.ndarray]:
     """Read xyz file.
 
@@ -154,13 +151,13 @@ def read_xyz(file: str) -> tuple[np.ndarray, np.ndarray]:
 
     Returns:
         tuple: A tuple containing element symbols and coordinates.
-    
+
     Raises:
         ValueError: If parsed number of atoms in first line does not match length of element symbol list
     """
 
-    elms : list[str] = []
-    coords : list[list[float]] = []
+    elms: list[str] = []
+    coords: list[list[float]] = []
 
     with open(file) as f:
         nat = int(f.readline().strip())
@@ -169,49 +166,46 @@ def read_xyz(file: str) -> tuple[np.ndarray, np.ndarray]:
             lin = line.strip()
             if not lin:
                 continue
-            elms.append(lin.split()[0].lower()) # store lower case elements
+            elms.append(lin.split()[0].lower())  # store lower case elements
             coords.append([float(a) for a in lin.split()[1:4]])
 
     if len(elms) != nat:
-        raise ValueError(
-            f"Expected {nat} atoms in {file}, found {len(elms)}"
-        )
-            
+        raise ValueError(f"Expected {nat} atoms in {file}, found {len(elms)}")
+
     return np.array(elms, dtype=str), np.array(coords)
 
 
-def sort_csv_by_x(input_file : str, output_file : str) -> None:
-    """ Read a .csv file, sort rows by the first column, and write to a new file.
-    
+def sort_csv_by_x(input_file: str, output_file: str) -> None:
+    """Read a .csv file, sort rows by the first column, and write to a new file.
+
     Args:
         input_file (str): Path to the input .csv file.
         output_file (str): Path to the output .csv file.
 
     Returns:
-        None. 
+        None.
     """
-    with open(input_file, 'r') as f:
+    with open(input_file, "r") as f:
         lines = f.readlines()
 
     # Keep header
     header = lines[0].strip()
 
-    rows : list[tuple[float, float]] = []
+    rows: list[tuple[float, float]] = []
     for line in lines[1:]:
         lin = line.strip()
-        if not lin: # skip empty lines
+        if not lin:  # skip empty lines
             continue
-        parts = line.strip().split(',')
+        parts = line.strip().split(",")
 
         rows.append((float(parts[0]), float(parts[1])))
-
 
     # Sort by x value
     rows.sort(key=lambda row: row[0])
 
     # Write sorted data
-    with open(output_file, 'w', newline='') as f:
-        f.write(header + '\n')
+    with open(output_file, "w", newline="") as f:
+        f.write(header + "\n")
         writer = csv.writer(f)
         for row in rows:
             writer.writerow(row)
@@ -244,23 +238,16 @@ def write_spectrum(
     path = Path(path)
 
     if path.exists() and not overwrite:
-        raise FileExistsError(
-            f"File already exists: {path}"
-        )
+        raise FileExistsError(f"File already exists: {path}")
 
     # ------------------------------------------------------------------
     # Validate metadata
     # ------------------------------------------------------------------
 
-    missing = [
-        field for field in REQUIRED_FIELDS
-        if field not in spectrum.metadata
-    ]
+    missing = [field for field in REQUIRED_FIELDS if field not in spectrum.metadata]
 
     if missing:
-        raise ValueError(
-            f"Spectrum metadata missing required fields: {missing}"
-        )
+        raise ValueError(f"Spectrum metadata missing required fields: {missing}")
 
     _validate_header(spectrum.metadata)
 
@@ -268,10 +255,7 @@ def write_spectrum(
     # Build header line
     # ------------------------------------------------------------------
 
-    header = ",".join(
-        str(spectrum.metadata[field]).strip()
-        for field in REQUIRED_FIELDS
-    )
+    header = ",".join(str(spectrum.metadata[field]).strip() for field in REQUIRED_FIELDS)
 
     # ------------------------------------------------------------------
     # Build data block
@@ -284,7 +268,6 @@ def write_spectrum(
     # ------------------------------------------------------------------
 
     with open(path, "w", newline="\n") as f:
-
         # write header manually
         f.write(header + "\n")
 
@@ -294,6 +277,7 @@ def write_spectrum(
             data,
             delimiter=",",
         )
+
 
 # ---------------------------------------------------------------------
 # Dataset loading
@@ -319,7 +303,6 @@ def _clean(value: str) -> str:
     if value == "0":
         return "-"
     return value.lower()
-
 
 
 def load_dataset_metadata(
@@ -354,32 +337,34 @@ def load_dataset_metadata(
     records = []
 
     for file in files:
-
         try:
             spec = read_spectrum(str(file))
             m = spec.metadata
 
-            records.append({
-                "id": _id(file),
-                "file": file.name,
-                "path": str(file),
-                "mol": _clean(m["molname"]),
-                "doi": _clean(m["DOI"]),
-                "T": _clean(m["T"]),
-                "c": _clean(m["c"]),
-                "solv": _clean(m["solv"]),
-                "irrad": _clean(m["irrad"]),
-                "quant": _clean(m["quant"]),
-                "unit": _clean(m["unit"]),
-            })
+            records.append(
+                {
+                    "id": _id(file),
+                    "file": file.name,
+                    "path": str(file),
+                    "mol": _clean(m["molname"]),
+                    "doi": _clean(m["DOI"]),
+                    "T": _clean(m["T"]),
+                    "c": _clean(m["c"]),
+                    "solv": _clean(m["solv"]),
+                    "irrad": _clean(m["irrad"]),
+                    "quant": _clean(m["quant"]),
+                    "unit": _clean(m["unit"]),
+                }
+            )
 
         except (ValueError, OSError) as exc:
-
-            records.append({
-                "id": _id(file),
-                "file": file.name,
-                "error": str(exc),
-            })
+            records.append(
+                {
+                    "id": _id(file),
+                    "file": file.name,
+                    "error": str(exc),
+                }
+            )
 
     return records
 
@@ -387,6 +372,7 @@ def load_dataset_metadata(
 # ---------------------------------------------------------------------
 # Pretty summary printer
 # ---------------------------------------------------------------------
+
 
 def summarize_dataset(
     records: str | Path | list[dict[str, Any]],
@@ -407,22 +393,28 @@ def summarize_dataset(
     if isinstance(records, (str, Path)):
         records = load_dataset_metadata(str(records))
 
-    COLS = {
-        "file":   {"title": "File",       "width": 20},
-        "mol":    {"title": "Molecule",   "width": 16},
-        "doi":    {"title": "DOI",        "width": 36},
-        "T":      {"title": "T (K)",      "width": 10},
-        "c":      {"title": "c (M)",      "width": 10},
-        "solv":   {"title": "Solvent",    "width": 14},
-        "irrad":  {"title": "λirr (nm)",  "width": 10},
-        "quant":  {"title": "Quant",      "width": 8},
-        "unit":   {"title": "Unit",       "width": 8},
+    COLS: dict[str, dict[str, Any]] = {
+        "file": {"title": "File", "width": 20},
+        "mol": {"title": "Molecule", "width": 16},
+        "doi": {"title": "DOI", "width": 36},
+        "T": {"title": "T (K)", "width": 10},
+        "c": {"title": "c (M)", "width": 10},
+        "solv": {"title": "Solvent", "width": 14},
+        "irrad": {"title": "λirr (nm)", "width": 10},
+        "quant": {"title": "Quant", "width": 8},
+        "unit": {"title": "Unit", "width": 8},
     }
 
     DEFAULT_COLUMNS = [
-        "file", "mol", "doi",
-        "T", "c", "solv",
-        "irrad", "quant", "unit",
+        "file",
+        "mol",
+        "doi",
+        "T",
+        "c",
+        "solv",
+        "irrad",
+        "quant",
+        "unit",
     ]
 
     if columns is None:
@@ -434,14 +426,13 @@ def summarize_dataset(
 
     def trunc(s: str, width: int) -> str:
         s = str(s)
-        return s if len(s) <= width else s[:width - 1] + "…"
+        return s if len(s) <= width else s[: width - 1] + "…"
 
     def row(values: dict[str, Any]) -> str:
 
         parts = []
 
         for col in columns:
-
             width = COLS[col]["width"]
             val = str(values.get(col, "-"))
 
@@ -452,10 +443,7 @@ def summarize_dataset(
 
         return "  " + "  ".join(parts)
 
-    header = row({
-        c: COLS[c]["title"]
-        for c in columns
-    })
+    header = row({c: COLS[c]["title"] for c in columns})
 
     sep_width = sum(COLS[c]["width"] for c in columns) + 2 * len(columns)
     separator = "-" * sep_width
@@ -471,7 +459,6 @@ def summarize_dataset(
     n_err = 0
 
     for rec in records:
-
         if "error" in rec:
             print(f"  ERROR  {rec['file']}: {rec['error']}")
             n_err += 1
@@ -489,6 +476,7 @@ def summarize_dataset(
 # Query helpers
 # ---------------------------------------------------------------------
 
+
 def get_solvents(
     records: list[dict[str, Any]],
     unique: bool = False,
@@ -497,11 +485,7 @@ def get_solvents(
     Return the solvents of all records (unique=True: sorted, without repeats).
     """
 
-    solvents = [
-        r["solv"]
-        for r in records
-        if "solv" in r and r["solv"] not in {"-", ""}
-    ]
+    solvents = [r["solv"] for r in records if "solv" in r and r["solv"] not in {"-", ""}]
     return sorted(set(solvents)) if unique else solvents
 
 
@@ -512,11 +496,7 @@ def count_solvents(
     Count solvent occurrences.
     """
 
-    return Counter(
-        r["solv"]
-        for r in records
-        if "solv" in r and r["solv"] not in {"-", ""}
-    )
+    return Counter(r["solv"] for r in records if "solv" in r and r["solv"] not in {"-", ""})
 
 
 def filter_records(
@@ -533,11 +513,9 @@ def filter_records(
     out = []
 
     for r in records:
-
         match = True
 
         for key, value in criteria.items():
-
             if r.get(key) != value:
                 match = False
                 break
@@ -556,7 +534,6 @@ def get_solvents_by_molecule(records: list[dict[str, Any]]) -> dict[int, str]:
     solvents = {}
 
     for r in records:
-
         if "solv" not in r:
             continue
 

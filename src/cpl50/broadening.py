@@ -116,8 +116,11 @@ def delta_epsilon_spectrum(
 ) -> Spectrum:
     """ECD as delta-eps in L mol^-1 cm^-1 from rotatory strengths R in 1e-40 esu^2 cm^2.
 
-    delta_eps(nu) = 32 pi^3 N_A nu / (3000 ln10 h c) * sum_i R_i g(nu - nu_i)  (cgs, nu in cm^-1)
-                  = nu * sum_i R_i[1e-40 cgs] g(nu - nu_i) / 22.96
+    ::
+
+        delta_eps(nu) = 32 pi^3 N_A nu / (3000 ln10 h c) * sum_i R_i g(nu - nu_i)  (cgs, nu in cm^-1)
+                      = nu * sum_i R_i[1e-40 cgs] g(nu - nu_i) / 22.96
+
     Same construction as eps written with dipole strengths, so delta_eps/eps -> 4R/D = g_abs.
     """
     e, x, w = _to_cm1(energies, grid, fwhm, unit)

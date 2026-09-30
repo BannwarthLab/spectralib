@@ -11,7 +11,10 @@ X_UNITS = ("nm", "ev", "cm-1")
 
 
 def _jacobian(x: np.ndarray, init: str, final: str) -> np.ndarray:
-    """|dx_init/dx_final| at x (init units) up to a constant: x^2 for nm -> energy, x^-2 for energy -> nm."""
+    r""":math:`|dx_\mathrm{init}/dx_\mathrm{final}|` at x (init units) up to a constant.
+
+    x^2 for nm -> energy, x^-2 for energy -> nm.
+    """
     if (init == "nm") == (final == "nm"):
         return np.ones_like(x)
     return x**2 if init == "nm" else 1.0 / x**2
@@ -44,11 +47,11 @@ class Spectrum:
         return Spectrum(x, y, xunit or self.xunit, self.metadata)
 
     def convert_x(self, final: str, jacobian: bool = False) -> Spectrum:
-        """Convert the x axis; reorders points for reciprocal conversions (nm <-> energy).
+        r"""Convert the x axis; reorders points for reciprocal conversions (nm <-> energy).
 
         Args:
             final: Target unit.
-            jacobian: Multiply y by |dx_old/dx_new| (up to a constant). Use for spectral
+            jacobian: Multiply y by :math:`|dx_\mathrm{old}/dx_\mathrm{new}|` (up to a constant). Use for spectral
                 densities recorded per wavelength interval (LUM intensity, CPL delta I);
                 not for epsilon, delta-epsilon or g_lum.
         """
@@ -56,7 +59,7 @@ class Spectrum:
         if final not in X_UNITS:
             raise ValueError(f"Unknown xunit '{final}'. Choose from {X_UNITS}.")
         # copy: convert_energy_unit overwrites arrays in place for nm <-> energy
-        x_new = convert_energy_unit(self.x.copy(), self.xunit, final)
+        x_new = np.asarray(convert_energy_unit(self.x.copy(), self.xunit, final))
         y_new = self.y * _jacobian(self.x, self.xunit, final) if jacobian else self.y.copy()
         order = np.argsort(x_new)
         return self._new(x_new[order], y_new[order], final)
@@ -73,10 +76,10 @@ class Spectrum:
         return self._new(self.x[mask], self.y[mask])
 
     def normalize(self, mode: str = "max") -> Spectrum:
-        """Sign-preserving normalisation.
+        r"""Sign-preserving normalisation.
 
-        mode='max':  max|y| = 1 (plotting; depends on broadening width).
-        mode='area': integral |y| dx = 1 (metrics; invariant to broadening width for isolated bands).
+        - ``mode='max'``: :math:`\max|y| = 1` (plotting; depends on broadening width).
+        - ``mode='area'``: :math:`\int|y|\,dx = 1` (metrics; invariant to broadening width for isolated bands).
         """
         if mode == "max":
             norm = np.max(np.abs(self.y))

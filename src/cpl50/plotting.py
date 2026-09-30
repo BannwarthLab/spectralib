@@ -2,11 +2,17 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 from tcgm_unitkit import convert_energy_unit
 
 from cpl50.spectrum import Spectrum
+
+if TYPE_CHECKING:
+    from matplotlib.axes._secondary_axes import SecondaryAxis
 
 _XLABEL = {"ev": "Energy / eV", "cm-1": r"Wavenumber / cm$^{-1}$", "nm": "Wavelength / nm"}
 
@@ -30,14 +36,14 @@ def plot_sticks(
     return ax
 
 
-def add_wavelength_axis(ax: plt.Axes) -> plt.Axes:
+def add_wavelength_axis(ax: plt.Axes) -> SecondaryAxis:
     """Secondary top axis in nm for an eV bottom axis."""
 
-    def f(x: np.ndarray) -> np.ndarray:
-        x = np.asarray(x, dtype=float)
-        out = np.full_like(x, np.inf)
-        ok = x > 0
-        out[ok] = convert_energy_unit(x[ok], "ev", "nm")  # x[ok] is already a copy
+    def f(x: npt.ArrayLike) -> np.ndarray:
+        e = np.asarray(x, dtype=float)
+        out = np.full_like(e, np.inf)
+        ok = e > 0
+        out[ok] = convert_energy_unit(e[ok], "ev", "nm")  # e[ok] is already a copy
         return out
 
     sec = ax.secondary_xaxis("top", functions=(f, f))

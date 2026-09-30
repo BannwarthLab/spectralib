@@ -17,6 +17,7 @@ Recommended protocol for signed spectra (CPL/ECD): see ``benchmark``.
 from __future__ import annotations
 
 import numpy as np
+import numpy.typing as npt
 from scipy.integrate import trapezoid
 from scipy.optimize import linear_sum_assignment
 
@@ -45,12 +46,12 @@ def _grid(ref: Spectrum, calc: Spectrum, shifts: np.ndarray, n: int, window: str
     return np.linspace(lo, hi, n)
 
 
-def _sample(ref: Spectrum, calc: Spectrum, shifts: np.ndarray, n: int, window: str) -> tuple:
+def _sample(ref: Spectrum, calc: Spectrum, shifts: npt.ArrayLike, n: int, window: str) -> tuple:
     """x (n,), a = ref (n,), b = calc(x - shift) (m, n) for every shift."""
     _check_ev(ref, calc)
-    shifts = np.atleast_1d(np.asarray(shifts, dtype=float))
-    x = _grid(ref, calc, shifts, n, window)
-    return x, ref(x), calc(x[None, :] - shifts[:, None])
+    s = np.atleast_1d(np.asarray(shifts, dtype=float))
+    x = _grid(ref, calc, s, n, window)
+    return x, ref(x), calc(x[None, :] - s[:, None])
 
 
 def _cos(x: np.ndarray, a: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -128,12 +129,14 @@ def e_spe(
     n: int = _N,
     window: str = "ref",
 ) -> float:
-    """Spectral error E_spe = int |ref - calc| / int |ref|  (Zhou & Parker, JPCL 2023, Eq. 12).
+    r"""Spectral error :math:`E_\mathrm{spe} = \int|y^\mathrm{ref}-y^\mathrm{calc}| / \int|y^\mathrm{ref}|`.
 
-    The paper compares spectra in the same absolute units (norm=None). Against experiment
-    (arbitrary units) both are normalised first; with norm='area' (int |y| = 1):
-    0 = identical, 2 = no overlap or exact sign inversion. |ref| in the denominator makes it
-    defined for signed spectra.
+    Zhou & Parker, JPCL 2023, Eq. 12.
+
+    The paper compares spectra in the same absolute units (``norm=None``). Against experiment
+    (arbitrary units) both are normalised first; with ``norm='area'`` (:math:`\int|y| = 1`):
+    0 = identical, 2 = no overlap or exact sign inversion. :math:`|y^\mathrm{ref}|` in the
+    denominator makes it defined for signed spectra.
     """
     x, a, b = _sample(ref, calc, shift, n, window)
     return float(_espe(x, a, b[0], norm))
@@ -175,7 +178,7 @@ def optimal_shift(
 
 
 def lobe_areas(spec: Spectrum) -> tuple[float, float]:
-    """(A+, A-) = integrals of the positive part and of |negative part|."""
+    """(A+, A-) = integrals of the positive part and of the absolute value of the negative part."""
     return float(trapezoid(np.maximum(spec.y, 0), spec.x)), float(trapezoid(np.maximum(-spec.y, 0), spec.x))
 
 
@@ -211,12 +214,12 @@ def peak_energy(spec: Spectrum, smooth_fwhm: float | None = None) -> float:
 
 
 def e_ene(ref_energies: np.ndarray, calc_energies: np.ndarray, match: bool = False) -> float:
-    """RMSD of excitation energies, E_ene (Zhou & Parker, JPCL 2023, Eq. 11).
+    r"""RMSD of excitation energies, E_ene (Zhou & Parker, JPCL 2023, Eq. 11).
 
     Args:
         ref_energies, calc_energies: Paired energies (state i <-> i, or molecule i <-> i
             for band maxima across a dataset).
-        match: Re-pair states by minimal total |dE| (Hungarian assignment) to handle
+        match: Re-pair states by minimal total :math:`|\Delta E|` (Hungarian assignment) to handle
             root flipping; the paper uses eigenvector overlaps, which are not available here.
     """
     r = np.asarray(ref_energies, dtype=float)
@@ -250,7 +253,7 @@ def benchmark(
          taken after Gaussian smoothing (``smooth_fwhm``, eV; None to disable).
       2. shift: pass one explicitly (recommended for CPL/ECD: the shift found on the
          corresponding LUM/UV-vis pair, since both come from the same transitions), or it is
-         optimised here - on |y| for signed spectra, so the alignment cannot trade an energy
+         optimised here - on :math:`|y|` for signed spectra, so the alignment cannot trade an energy
          error against a sign error.
       3. At that shift: signed cosine, lobe cosines (signed only), area-normalised E_spe.
       4. Signed: dominant-sign match (calc evaluated inside the window after the shift) plus

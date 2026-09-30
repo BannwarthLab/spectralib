@@ -1,4 +1,4 @@
-""" Stores types and dicts to validate entries in header. """
+"""Stores types and dicts to validate entries in header."""
 
 from __future__ import annotations
 
@@ -10,22 +10,22 @@ import numpy as np
 REQUIRED_FIELDS = ["DOI", "molname", "T", "c", "solv", "irrad", "quant", "unit"]
 
 # -----  Registry of valid keys within the header in CPL50  ----- #
-DOI_REGEX = re.compile(r'^10\.\d{4,9}/[-._;()/:A-Z0-9]+$', re.IGNORECASE)
+DOI_REGEX = re.compile(r"^10\.\d{4,9}/[-._;()/:A-Z0-9]+$", re.IGNORECASE)
 
 
 VALID_SOLVENTS = {
-    "meoh",   # methanol
-    "ch3oh",  
-    "etoh",   # ethanol
-    "h2o",    # water
-    "mecn",    # acetonitrile
-    "toluene", # toluene
+    "meoh",  # methanol
+    "ch3oh",
+    "etoh",  # ethanol
+    "h2o",  # water
+    "mecn",  # acetonitrile
+    "toluene",  # toluene
     "tol",
-    "hexane", # hexane
-    "dcm", # dichloromethane
-    "ch2cl2", # dcm
-    "chloroform", # chloroform
-    "chcl3", 
+    "hexane",  # hexane
+    "dcm",  # dichloromethane
+    "ch2cl2",  # dcm
+    "chloroform",  # chloroform
+    "chcl3",
     "p-dioxane",
     "1-4-dioxane",
     "dmf",
@@ -33,7 +33,7 @@ VALID_SOLVENTS = {
     "cyclohexane",
     "ccl4",
     "me-chex",
-    #"0",      # allow missing value
+    # "0",      # allow missing value
 }
 
 
@@ -70,21 +70,22 @@ SOLVENT_ALIASES = {
     "dmf": "dmf",
 }
 
-DIELECTRIC_CONSTANTS = { # https://comp.chem.umn.edu/solvation/mnsddb.pdf
-    "carbon tetrachloride" : 2.2280,
-    "dichloromethane" : 8.93, 
-    "chloroform" : 4.7113,
-    "cyclohexane" : 2.0165,
-    "ethanol" : 24.852,
-    "methanol" : 32.613,
-    "p-dioxane" : 2.2099,
-    "toluene" : 2.3741,
-    "water" : 78.3553,
-    "acetonitrile" : 35.6881,
-    "hexane" : 1.8819,
-    "dmf" : 37.2190,
-    "methylcyclohexane" : 2.024,
+DIELECTRIC_CONSTANTS = {  # https://comp.chem.umn.edu/solvation/mnsddb.pdf
+    "carbon tetrachloride": 2.2280,
+    "dichloromethane": 8.93,
+    "chloroform": 4.7113,
+    "cyclohexane": 2.0165,
+    "ethanol": 24.852,
+    "methanol": 32.613,
+    "p-dioxane": 2.2099,
+    "toluene": 2.3741,
+    "water": 78.3553,
+    "acetonitrile": 35.6881,
+    "hexane": 1.8819,
+    "dmf": 37.2190,
+    "methylcyclohexane": 2.024,
 }
+
 
 def canonicalize_solvent(solvent: str) -> str:
     """
@@ -108,18 +109,18 @@ VALID_QUANT_CP = {
 
 VALID_UNIT_CP = {
     "mdeg",
-    "0" # allow missing value
+    "0",  # allow missing value
 }
 
 VALID_QUANT_LUM = {
-    "i", # prohibit missing value
-    "dc", # differential current (in V)? 
+    "i",  # prohibit missing value
+    "dc",  # differential current (in V)?
 }
 
 VALID_UNIT_LUM = {
-    "0", # allow missing value
-    "v" # volts, only seen in https://pubs.rsc.org/en/content/articlepdf/2015/ra/c4ra11488d for 51-53 so far
- }
+    "0",  # allow missing value
+    "v",  # volts, only seen in https://pubs.rsc.org/en/content/articlepdf/2015/ra/c4ra11488d for 51-53 so far
+}
 
 
 def kabsch_rmsd(xyz1: np.ndarray, xyz2: np.ndarray) -> float:

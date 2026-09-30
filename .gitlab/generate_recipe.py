@@ -1,4 +1,4 @@
-"""Generate Apptainer recipe files for the supported OS/Python combinations."""  # noqa: INP001
+"""Generate Apptainer recipe files for the supported OS/Python combinations."""
 
 from __future__ import annotations
 

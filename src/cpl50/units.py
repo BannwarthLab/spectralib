@@ -1,12 +1,14 @@
-"""Spectroscopic prefactors built from the ``tcgm_unitkit`` physical constants.
+r"""Spectroscopic prefactors built from the ``tcgm_unitkit`` physical constants.
 
 Energy-axis conversions use ``tcgm_unitkit.convert_energy_unit`` directly.
 
 Conventions for transition quantities:
-    f    oscillator strength (dimensionless)
-    D    dipole strength |<0|mu|n>|^2,             reported in 1e-40 esu^2 cm^2
-    R    rotatory strength Im(<0|mu|n>.<n|m|0>),    reported in 1e-40 esu^2 cm^2
-         (the "R (1e40*cgs)" column of ORCA/Turbomole)
+
+- ``f``: oscillator strength (dimensionless)
+- ``D``: dipole strength :math:`|\langle 0|\mu|n\rangle|^2`, reported in 1e-40 esu^2 cm^2
+- ``R``: rotatory strength :math:`\mathrm{Im}(\langle 0|\mu|n\rangle\cdot\langle n|m|0\rangle)`, reported in
+  1e-40 esu^2 cm^2 (the "R (1e40*cgs)" column of ORCA/Turbomole)
+
 With D and R in the same units, the dissymmetry factor is g = 4 R / D.
 """
 
@@ -39,9 +41,11 @@ CGS40 = 1e-40
 #: SI: N_A e^2 / (4 eps0 m_e c^2 ln10) [m mol^-1]; x10 (m^2/mol -> L mol^-1 cm^-1), x1e-2 (m^-1 -> cm^-1).
 #: Integrated form: f = int eps dnu / K_EPS  (K_EPS = 2.315e8 L mol^-1 cm^-2).
 K_EPS = (
-    AVOGADRO_CONSTANT * ELEMENTARY_CHARGE**2
+    AVOGADRO_CONSTANT
+    * ELEMENTARY_CHARGE**2
     / (4.0 * VACUUM_PERMITTIVITY * ELECTRON_MASS * SPEED_OF_LIGHT**2 * _LN10)
-    * 10.0 * 1e-2
+    * 10.0
+    * 1e-2
 )
 
 #: delta_eps(nu) = K_DEPS * nu * R * g(nu), nu in cm^-1, R in esu^2 cm^2  ->  L mol^-1 cm^-1.
@@ -65,7 +69,7 @@ def osc_to_dipole_strength(energy_ev: np.ndarray, f: np.ndarray) -> np.ndarray:
 
 
 def au_dipole_strength_to_cgs40(d_au: np.ndarray) -> np.ndarray:
-    """Convert |mu|^2 from (e a0)^2 to 1e-40 esu^2 cm^2."""
+    r"""Convert :math:`|\mu|^2` from (e a0)^2 to 1e-40 esu^2 cm^2."""
     ea0_esu_cm = _E_ESU * convert_length_unit(1.0, "bohr", "cm")
     return np.asarray(d_au, dtype=float) * ea0_esu_cm**2 / CGS40
 
