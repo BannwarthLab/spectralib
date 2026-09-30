@@ -1,35 +1,74 @@
 [build-system]
-requires = ["setuptools>=64", "wheel"]
+requires = ["setuptools>=65", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "cpl50"
 version = "0.0.1"
 description = "Analysis Tools for LUM and CPL Dataset."
-authors = [{name = "Mike Pauls"}]
-requires-python = ">=3.10"
+readme = "README.md"
+license = {file = "LICENSE"}
+requires-python = ">=3.12"
+
+authors = [
+    {name = "Mike Pauls"},
+]
+
+maintainers = [
+    {name = "Mike Pauls"},
+]
+
 dependencies = [
     "numpy",
     "scipy",
-    "tcgm_unitkit @ git+https://gitlab.git.nrw/rwth-bannwarthlab/utils/tcgm_unitkit.git",
+    "tcgm_unitkit @ git+ssh://git@gitlab.git.nrw/rwth-bannwarthlab/utils/tcgm_unitkit.git@main"
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: Unix",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 [project.optional-dependencies]
-plot = ["matplotlib"]
-test = [
+plot = [
     "matplotlib",
+]
+
+dev = [
     "pytest",
     "pytest-cov",
     "pytest-xdist",
-    "ruff"
+    "ruff",
+    "build",
+    "mypy",
+    "matplotlib",
+]
+
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "sphinxcontrib-bibtex",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
-pythonpath = ["src"]
 testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.mypy]
+exclude = ["docs"]
+ignore_missing_imports = true
+no_implicit_optional = false
+packages = "cpl50"
+
 [tool.ruff]
+target-version = "py312"
+extend-exclude = ["tests"]
 line-length = 121
-extend-exclude = ["workflows"]  # moved scripts, kept unchanged for discussion
