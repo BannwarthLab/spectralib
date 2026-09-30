@@ -3,3 +3,4 @@ __pycache*
 *.egg-info
 _*
 *.sh
+!docs/source/_static/
