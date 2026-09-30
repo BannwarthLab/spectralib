@@ -1,0 +1,147 @@
+include:
+  - local: .gitlab/common-scripts.yml
+
+
+.pre_install:
+  script:
+    - set -e
+    - export PYTHONPATH="$CI_PROJECT_DIR/src:$CI_PROJECT_DIR/.pydeps:$PYTHONPATH"
+
+stages:
+  - build-container
+  - main-testing
+  - documentation-build
+  - documentation-deploy
+
+# Containers
+.matrix: &matrix
+  parallel:
+    matrix:
+      - OS:
+          - "RL10"
+        PYTHON:
+          - "python3.12"
+          - "python3.13"
+          - "python3.14"
+
+.test_template: &test_template
+  IMAGE_NAME: ""
+  CONTAINER_NAME: "${OS}-${PYTHON}"
+  APPTAINER_RECIPE: "${CONTAINER_NAME}.def"
+  APPTAINER_RECIPE_GENERATE_CMD: "touch .gitconfig_build && python3 .gitlab/generate_recipe.py ${CONTAINER_NAME}"
+
+# Main container building
+build-containers:
+  stage: build-container
+  extends: .build_container
+  tags:
+    - shell
+  <<: *matrix
+
+# Main testing
+main-test-ruff:
+  <<: [*matrix]
+  stage: main-testing
+  image: "${CONTAINER_NAME}"
+  needs:
+    - build-containers
+  before_script:
+    - !reference [.pre_install, script]
+  tags:
+    - cpu
+  variables:
+    <<: *test_template
+    APPTAINER_EXEC_ARGS: "--bind $CI_PROJECT_DIR:$CI_PROJECT_DIR"
+    APPTAINER_BIND: "$CI_PROJECT_DIR:$CI_PROJECT_DIR"
+  script:
+    - ruff check src/
+    - ruff format --check src/
+
+main-test-mypy:
+  <<: [*matrix]
+  stage: main-testing
+  image: "${CONTAINER_NAME}"
+  needs:
+    - build-containers
+  before_script:
+    - !reference [.pre_install, script]
+  tags:
+    - cpu
+  variables:
+    <<: *test_template
+    APPTAINER_EXEC_ARGS: "--bind $CI_PROJECT_DIR:$CI_PROJECT_DIR"
+    APPTAINER_BIND: "$CI_PROJECT_DIR:$CI_PROJECT_DIR"
+  script:
+    - mypy src/
+
+main-test-pytest:
+  <<: [*matrix]
+  stage: main-testing
+  image: "${CONTAINER_NAME}"
+  needs:
+    - build-containers
+  before_script:
+    - !reference [.pre_install, script]
+  tags:
+    - cpu
+  variables:
+    <<: *test_template
+    APPTAINER_EXEC_ARGS: "--bind $CI_PROJECT_DIR:$CI_PROJECT_DIR"
+    APPTAINER_BIND: "$CI_PROJECT_DIR:$CI_PROJECT_DIR"
+  script:
+    - pytest tests/ --cov=cpl50 --cov-report term --cov-report xml:coverage.xml --cov-report html:htmlcov
+
+  artifacts:
+    paths:
+      - htmlcov/
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+
+# Build documentation
+documentation-build:
+  stage: documentation-build
+  image: "${CONTAINER_NAME}"
+  needs:
+    - build-containers
+  before_script:
+    - !reference [.pre_install, script]
+  variables:
+    <<: *test_template
+    OS: "RL10"
+    PYTHON: "python3.13"
+    APPTAINER_EXEC_ARGS: ""
+  tags:
+    - cpu
+  script:
+    - sphinx-build -b html docs/source docs/_build
+
+  artifacts:
+    paths:
+      - docs/_build
+
+# Deploy docs (job must be named "pages" for GitLab Pages to publish it)
+pages:
+  stage: documentation-deploy
+  image: "${CONTAINER_NAME}"
+  needs:
+    - job: documentation-build
+      artifacts: true
+  before_script:
+    - !reference [.pre_install, script]
+  variables:
+    OS: "RL10"
+    PYTHON: "python3.13"
+    <<: *test_template
+    APPTAINER_EXEC_ARGS: ""
+  tags:
+    - cpu
+  script:
+    - mkdir -p public
+    - mv docs/_build/* public/
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+  artifacts:
+    paths:
+      - public
