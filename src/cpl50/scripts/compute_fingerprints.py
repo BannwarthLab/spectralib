@@ -66,7 +66,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("target", type=Path, help=".xyz file or directory (searched recursively)")
     parser.add_argument(
-        "-j", "--threads", type=int, default=1, help="structures processed in parallel (default: 1, -1: all available cores)"
+        "-j",
+        "--threads",
+        type=int,
+        default=1,
+        help="structures processed in parallel (default: 1, -1: all available cores)",
     )
     args = parser.parse_args(argv)
 
