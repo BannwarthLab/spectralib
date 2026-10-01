@@ -1,6 +1,6 @@
 __pycache*
 *venv*
 *.egg-info
-_*
+/_*
 *.sh
-!docs/source/_static/
+docs/_build/

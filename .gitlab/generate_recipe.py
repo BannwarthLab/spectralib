@@ -82,7 +82,7 @@ def generate_recipe(name: str) -> str:
         # Project package installation
         lines.append("    # Install project package and dev dependencies")
         lines.append("    cd /opt/cpl50")
-        lines.append('    pip install --no-cache-dir --upgrade --force-reinstall -e ".[dev,docs]"')
+        lines.append('    pip install --no-cache-dir --upgrade --force-reinstall -e ".[dev,docs,fingerprint]"')
         lines.append("")
 
         # Clean up git config credentials inside image

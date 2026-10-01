@@ -1,17 +1,19 @@
 [build-system]
-requires = ["setuptools>=65", "wheel"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "cpl50"
-version = "0.0.1"
+version = "0.0.2"
 description = "Analysis Tools for LUM and CPL Dataset."
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "CC-BY-SA-4.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 
 authors = [
     {name = "Mike Pauls"},
+    {name = "Nicole Maser"},
 ]
 
 maintainers = [
@@ -39,6 +41,13 @@ plot = [
     "matplotlib",
 ]
 
+# pinned: the MolBar version is part of every barcode, InChI output depends on the Open Babel build
+fingerprint = [
+    "joblib",
+    "molbar==1.2.0",
+    "openbabel==3.2.1",
+]
+
 dev = [
     "pytest",
     "pytest-cov",
@@ -55,8 +64,12 @@ docs = [
     "sphinxcontrib-bibtex",
 ]
 
+[project.scripts]
+comp_fingerprints = "cpl50.scripts.compute_fingerprints:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["cpl50*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
