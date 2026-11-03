@@ -1,5 +1,6 @@
 __pycache*
 *venv*
 *.egg-info
-_*
+/_*
 *.sh
+docs/_build/
