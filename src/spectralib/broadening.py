@@ -56,7 +56,7 @@ def lorentzian(x: np.ndarray, center: float | np.ndarray, fwhm: float) -> np.nda
 def voigt_fwhm(fwhm_gauss: float, fwhm_lorentz: float) -> float:
     """FWHM of the Voigt profile from its Gaussian and Lorentzian FWHMs.
 
-    Olivero-Longbotham approximation :cite:`oliveroEmpiricalFitsVoigt1977`
+    Olivero-Longbotham approximation
     f = 0.5346 f_L + sqrt(0.2166 f_L^2 + f_G^2), within 0.03 % of the exact Voigt FWHM.
     """
     return float(0.5346 * fwhm_lorentz + np.sqrt(0.2166 * fwhm_lorentz**2 + fwhm_gauss**2))
@@ -96,7 +96,7 @@ def voigt(x: np.ndarray, center: float | np.ndarray, fwhm_gauss: float, fwhm_lor
 
 
 def pseudo_voigt_eta(fwhm_gauss: float, fwhm_lorentz: float) -> float:
-    """Lorentzian fraction eta of the TCH pseudo-Voigt :cite:`thompsonRietveldRefinementDebye1987`."""
+    """Lorentzian fraction eta of the TCH pseudo-Voigt."""
     q = fwhm_lorentz / _tch_fwhm(fwhm_gauss, fwhm_lorentz)
     return float(np.clip(1.36603 * q - 0.47719 * q**2 + 0.11116 * q**3, 0.0, 1.0))
 
