@@ -7,27 +7,47 @@ Each ``.csv`` file contains a 1-line header with information about the experimen
 
 with:
 
-- ``DOI``: The doi to the article the data was extracted from or presented in.
+.. list-table::
+   :header-rows: 1
+   :widths: 16 52 12 20
 
-- ``molname``: A short description/alias of the respective molecule, typically one that is given in the
-  corresponding article.
-
-- ``T``: The temperature (in K) at which the measurements were performed.
-  If none was given/found, ``0`` is added here. "Room temperature" refers to 293.15 K.
-
-- ``c``: The concentration (in M) at which the measurements were performed.
-  If none was given/found, ``0`` is added here.
-
-- ``solv``: A (short) name of the solvent used in the experiments.
-  A list of accepted solvents may be found in ``src/spectralib/utils.py`` and :ref:`below <dataset:Accepted Solvents>`.
-
-- ``irrad``: The used irradiation wavelength (in nm).
-  If none was given/found, ``0`` is added here.
-
-- ``quant``: The experimental quantity measured, e.g. ``di`` (:math:`\Delta I`) in CPF.
-
-- ``unit``: The unit of ``quant``, if provided.
-  If none was given/found, or the quantity is dimensionless, ``0`` is added here.
+   * - Field
+     - Meaning
+     - Unit
+     - If not reported
+   * - ``DOI``
+     - DOI of the article the data was extracted from or presented in.
+     - --
+     - required
+   * - ``molname``
+     - Short description/alias of the molecule, typically the one given in the corresponding article.
+     - --
+     - required
+   * - ``T``
+     - Temperature of the measurement. "Room temperature" refers to 293.15 K.
+     - K
+     - ``0``
+   * - ``c``
+     - Concentration of the measurement.
+     - M
+     - ``0``
+   * - ``solv``
+     - Short name of the solvent, see :ref:`Accepted Solvents <dataset:Accepted Solvents>` (also
+       ``src/spectralib/utils.py``).
+     - --
+     - required
+   * - ``irrad``
+     - Irradiation wavelength.
+     - nm
+     - ``0``
+   * - ``quant``
+     - Measured quantity, e.g. ``di`` (:math:`\Delta I`) in CPF.
+     - --
+     - required
+   * - ``unit``
+     - Unit of ``quant``.
+     - --
+     - ``0`` (also if dimensionless)
 
 A valid example header, e.g., for molecule 9 (``data/spectra/9/9_CPL.csv``) looks like this:
 
@@ -49,7 +69,7 @@ Data Format
      <wavelength2>, <quant2>
      ...
 
-- Molecular geometries:
+- Molecular geometries (with coordinates in Angstrom):
 
   .. code-block:: text
 
@@ -60,7 +80,7 @@ Data Format
      ...
 
 All geometries are optimized with the
-`semiempirical electronic structure theory method GFN2-xTB <https://pubs.acs.org/doi/10.1021/acs.jctc.8b01176>`__
+semiempirical electronic structure theory method `GFN2-xTB <https://pubs.acs.org/doi/10.1021/acs.jctc.8b01176>`__
 as implemented in the `xtb program <https://github.com/grimme-lab/xtb>`__ (version 6.7.0):
 ``xtb coord.xyz --opt (--chrg <int> --uhf <int>)``
 
@@ -70,9 +90,9 @@ in the ``.CHRG`` and ``.UHF`` files.
 Further Notes
 -------------
 
-- Measurements in thin films, matrices, or gels are omitted and deliberately excluded from the dataset at the moment.
+- Measurements in thin films, matrices or gels are omitted and deliberately excluded from the dataset at the moment (project version |version|).
 - Some geometries were simplified (truncation of flexible alkane chains, tBu -> Me, etc.) to be computationally more
-  tractable, and may differ from the Lewis structures illustrated in :doc:`data`.
+  tractable, and may differ from the Lewis structures illustrated in the original article. This is declared in the table in :doc:`data`.
 
 File Names
 ----------
@@ -93,7 +113,7 @@ etc.
 Accepted Solvents
 -----------------
 
-Generated from ``SOLVENT_ALIASES`` in ``src/spectralib/utils.py``; a new solvent is added there (and its dielectric
-constant to ``DIELECTRIC_CONSTANTS``).
+Generated from ``SOLVENT_ALIASES`` in ``src/spectralib/utils.py``. A new solvent should be added there with its dielectric constant ( ``DIELECTRIC_CONSTANTS``).
+The dielectric constants are taken from `https://comp.chem.umn.edu/solvation/mnsddb.pdf <https://comp.chem.umn.edu/solvation/mnsddb.pdf>`_
 
 .. include:: _generated/solvents.inc

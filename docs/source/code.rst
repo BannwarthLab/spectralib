@@ -34,7 +34,7 @@ Prefactors for :math:`\varepsilon` and :math:`\Delta\varepsilon` from the ``unit
 Broadening
 ----------
 
-Gaussian, Lorentzian, Voigt and pseudo-Voigt broadening (FWHM), ensemble averaging of sticks, :math:`\varepsilon` and :math:`\Delta\varepsilon`
+Gaussian/Lorentzian broadening (FWHM), ensemble averaging of sticks, :math:`\varepsilon` and :math:`\Delta\varepsilon`
 spectra and emission profiles.
 
 .. autosummary::

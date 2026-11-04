@@ -4,13 +4,25 @@ spectralib: A Dataset for Luminescence and Circularly Polarized Luminescence Spe
 .. image:: ../../imgs/spectralib_logo.svg
    :alt: spectralib logo
    :width: 320px
+   :align: center
 
 This project contains:
 
-- Experimental luminescence (``data/spectra/*LUM.csv``) and CPL (``data/spectra/*CPL.csv``) spectra.
-- Molecular structures (``data/structures/*.xyz``) in xyz format.
-- ``spectralib``, a small Python library to read and validate the data, broaden stick spectra and compare calculated with
-  experimental spectra.
+.. list-table::
+   :header-rows: 1
+   :widths: 60 40
+
+   * - Quantity
+     - Location
+   * - Experimental luminescence spectra
+     - ``data/spectra/<id>/<id>_LUM.csv``
+   * - Experimental CPL spectra
+     - ``data/spectra/<id>/<id>_CPL.csv``
+   * - Molecular structures (xyz format)
+     - ``data/structures/<id>/<id>.xyz``
+   * - ``spectralib``, a small Python library to read and validate the data, broaden stick spectra and compare
+       calculated with experimental spectra
+     - ``src/spectralib/``
 
 The source code and the dataset are hosted at `gitlab.git.nrw/rwth-bannwarthlab/cpl50
 <https://gitlab.git.nrw/rwth-bannwarthlab/cpl50>`__.

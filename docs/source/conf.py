@@ -108,7 +108,7 @@ autosectionlabel_prefix_document = True
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
-html_css_files = ["hack.css"]
+html_css_files = ["hack.css", "custom.css"]
 
 with open(os.path.join(os.path.dirname(__file__), "special.rst"), encoding="utf-8") as special_file:
     rst_prolog = "\n" + special_file.read() + "\n"

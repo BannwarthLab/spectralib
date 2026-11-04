@@ -5,7 +5,7 @@ The table lists all systems in the dataset together with the article the spectra
 
 .. list-table::
    :header-rows: 1
-   :widths: 10 40 50
+   :widths: 12 38 50
 
    * - Index
      - Molecule
@@ -131,7 +131,7 @@ The table lists all systems in the dataset together with the article the spectra
      - [12]-cpp
      - :cite:`fujikiQuestionsMirrorSymmetry2018`
    * - 41
-     - ACNP / ACNP@beta-CD
+     - ACNP / ACNP\@beta-CD
      - :cite:`yangSelfAssemblyCircularlyPolarized2021`
    * - 42
      - (P)-4
@@ -168,3 +168,15 @@ The table lists all systems in the dataset together with the article the spectra
      - :cite:`longhiStructuralOpticalProperties2014`
 
 :sup:`A` No luminescence spectrum available.
+:sup:`*` Truncated geometry, see below.
+
+Structures
+----------
+
+.. figure:: ../../imgs/structures.png
+   :alt: Lewis structures of systems 1-52
+   :width: 100%
+   :target: _images/structures.png
+
+   Lewis structures of systems 1–52 as of spectralib version 0.0.2. Red frames mark the 26-system subset.
+   The figure is not updated automatically: systems added after version 0.0.2 appear only in the table above.

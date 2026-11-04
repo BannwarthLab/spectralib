@@ -15,7 +15,7 @@ Python Library
        `tcgm-unitkit <https://gitlab.git.nrw/rwth-bannwarthlab/tcgm-unitkit>`__ constants;
        :math:`f\rightarrow D`; :math:`g = 4R/D` (axis conversions use ``unitkit.convert_energy_unit``)
    * - ``broadening``
-     - Gaussian, Lorentzian, Voigt and pseudo-Voigt broadening (FWHM), ensemble averaging of sticks, :math:`\varepsilon` and
+     - Gaussian/Lorentzian broadening (FWHM), ensemble averaging of sticks, :math:`\varepsilon` and
        :math:`\Delta\varepsilon` in L mol\ :sup:`-1` cm\ :sup:`-1`, emission profiles
    * - ``metrics``
      - Cosine similarity, lobe-resolved cosines, :math:`E_\mathrm{spe}`, :math:`E_\mathrm{ene}`, optimal shift,
@@ -53,9 +53,6 @@ not a dependency of ``spectralib``.
    d1  = osc_to_dipole_strength(e[:1], f[:1])
    lum = emission_spectrum(e[:1], d1, grid, fwhm=0.35)
    cpl = emission_spectrum(e[:1], 4 * r[:1], grid, fwhm=0.35)
-
-   # Voigt line shape: fwhm = (Gaussian FWHM, Lorentzian FWHM); "pseudo_voigt" takes the same tuple
-   lum_v = emission_spectrum(e[:1], d1, grid, fwhm=(0.30, 0.10), shape="voigt")
 
    exp_lum = read_spectrum("data/spectra/12/12_LUM.csv").convert_x("ev", jacobian=True)
    exp_cpl = read_spectrum("data/spectra/12/12_CPL.csv").convert_x("ev", jacobian=True)

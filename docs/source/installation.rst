@@ -3,8 +3,7 @@ Installation
 
 The ``spectralib`` library (spectrum I/O, broadening, comparison metrics, plotting) is
 pure Python and runs on Linux, macOS and Windows. Python 3.12 or newer is
-required. The dataset itself is part of the repository and is not installed with
-the library, so dataset work starts from a clone.
+required. The dataset itself is part of the repository and is **not installed** with the library.
 
 Option 1: conda / Anaconda (recommended on Windows)
 ---------------------------------------------------
@@ -70,6 +69,5 @@ Platform support
      - ✔
      - —
 
-MolBar publishes no Windows wheel, so ``pip install "spectralib[fingerprint]"``
-installs without it on Windows and the fingerprint tests skip there. Everything
-else, including the full dataset validation, runs on all three platforms.
+.. note:: 
+   MolBar v1.2.0 publishes no Windows wheel, so ``pip install "spectralib[fingerprint]"`` installs without it on Windows and the fingerprint tests skip there. Everything else, including the full dataset validation, runs on all three platforms.

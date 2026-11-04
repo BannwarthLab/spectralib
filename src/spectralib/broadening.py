@@ -4,22 +4,13 @@ All line shapes are area-normalised and parametrised by their FWHM, in the units
 the energy grid. Stick energies, grid and FWHM must share one linear energy unit
 ('ev' or 'cm-1'); broadening on a wavelength grid is not supported (convert afterwards).
 
-Available shapes (``shape=`` argument, ``fwhm=`` value):
-
-* ``"gaussian"``, ``"lorentzian"``: one FWHM.
-* ``"voigt"``: exact Voigt profile (Gaussian convolved with Lorentzian, Faddeeva function),
-  ``fwhm=(fwhm_gauss, fwhm_lorentz)``.
-* ``"pseudo_voigt"``: Thompson-Cox-Hastings pseudo-Voigt
-  (weighted sum of a Gaussian and a Lorentzian of the same total FWHM), same ``fwhm`` tuple.
-  Within ~1.5 % of the exact Voigt (relative to the peak height), cheaper to evaluate.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable, Sequence
+from collections.abc import Iterable
 
 import numpy as np
-from scipy.special import wofz
 from unitkit import convert_energy_unit
 
 from spectralib.spectrum import Spectrum
@@ -53,103 +44,20 @@ def lorentzian(x: np.ndarray, center: float | np.ndarray, fwhm: float) -> np.nda
     return hwhm / (np.pi * ((x - center) ** 2 + hwhm**2))
 
 
-def voigt_fwhm(fwhm_gauss: float, fwhm_lorentz: float) -> float:
-    """FWHM of the Voigt profile from its Gaussian and Lorentzian FWHMs.
-
-    Olivero-Longbotham approximation
-    f = 0.5346 f_L + sqrt(0.2166 f_L^2 + f_G^2), within 0.03 % of the exact Voigt FWHM.
-    """
-    return float(0.5346 * fwhm_lorentz + np.sqrt(0.2166 * fwhm_lorentz**2 + fwhm_gauss**2))
-
-
-def _tch_fwhm(fwhm_gauss: float, fwhm_lorentz: float) -> float:
-    """Total FWHM of the TCH pseudo-Voigt.
-
-    Up to 0.5 % off the exact Voigt FWHM, but the TCH mixing parameter eta is fitted with this width.
-    """
-    g, lo = fwhm_gauss, fwhm_lorentz
-    return float(
-        (g**5 + 2.69269 * g**4 * lo + 2.42843 * g**3 * lo**2 + 4.47163 * g**2 * lo**3 + 0.07842 * g * lo**4 + lo**5)
-        ** 0.2
-    )
-
-
-def _check_voigt_widths(fwhm_gauss: float, fwhm_lorentz: float) -> None:
-    if fwhm_gauss < 0 or fwhm_lorentz < 0 or fwhm_gauss + fwhm_lorentz == 0:
-        raise ValueError("Voigt widths must be >= 0 and not both zero.")
-
-
-def voigt(x: np.ndarray, center: float | np.ndarray, fwhm_gauss: float, fwhm_lorentz: float) -> np.ndarray:
-    """Exact, area-normalised Voigt profile: Re w(z) / (sigma sqrt(2 pi)), z = (x - x0 + i gamma) / (sigma sqrt 2).
-
-    w is the Faddeeva function, sigma the Gaussian standard deviation and gamma = fwhm_lorentz / 2.
-    A zero width reduces to the pure :func:`gaussian` or :func:`lorentzian`.
-    """
-    _check_voigt_widths(fwhm_gauss, fwhm_lorentz)
-    if fwhm_gauss == 0:
-        return lorentzian(x, center, fwhm_lorentz)
-    if fwhm_lorentz == 0:
-        return gaussian(x, center, fwhm_gauss)
-    sigma = sigma_from_fwhm(fwhm_gauss)
-    z = ((x - center) + 0.5j * fwhm_lorentz) / (sigma * np.sqrt(2.0))
-    return np.real(wofz(z)) / (sigma * np.sqrt(2.0 * np.pi))
-
-
-def pseudo_voigt_eta(fwhm_gauss: float, fwhm_lorentz: float) -> float:
-    """Lorentzian fraction eta of the TCH pseudo-Voigt."""
-    q = fwhm_lorentz / _tch_fwhm(fwhm_gauss, fwhm_lorentz)
-    return float(np.clip(1.36603 * q - 0.47719 * q**2 + 0.11116 * q**3, 0.0, 1.0))
-
-
-def pseudo_voigt(x: np.ndarray, center: float | np.ndarray, fwhm_gauss: float, fwhm_lorentz: float) -> np.ndarray:
-    """Thompson-Cox-Hastings pseudo-Voigt, area-normalised.
-
-    eta * L(x; f) + (1 - eta) * G(x; f): both components share one total FWHM f (TCH polynomial),
-    eta from :func:`pseudo_voigt_eta`. Deviates from the exact :func:`voigt` by at most ~1.5 % of the peak height.
-    """
-    _check_voigt_widths(fwhm_gauss, fwhm_lorentz)
-    f = _tch_fwhm(fwhm_gauss, fwhm_lorentz)
-    eta = pseudo_voigt_eta(fwhm_gauss, fwhm_lorentz)
-    return eta * lorentzian(x, center, f) + (1.0 - eta) * gaussian(x, center, f)
-
-
-# name -> (line shape, number of FWHM parameters)
-_SHAPES: dict[str, tuple[Callable[..., np.ndarray], int]] = {
-    "gaussian": (gaussian, 1),
-    "lorentzian": (lorentzian, 1),
-    "voigt": (voigt, 2),
-    "pseudo_voigt": (pseudo_voigt, 2),
-}
-
-Width = float | Sequence[float]
-"""One FWHM, or ``(fwhm_gauss, fwhm_lorentz)`` for ``"voigt"`` / ``"pseudo_voigt"``."""
-
-
-def _lineshape(shape: str, fwhm: Width) -> tuple[Callable[..., np.ndarray], tuple[float, ...]]:
-    if shape not in _SHAPES:
-        raise ValueError(f"Unknown shape {shape!r}, choose from {sorted(_SHAPES)}.")
-    func, n = _SHAPES[shape]
-    widths = tuple(float(w) for w in np.atleast_1d(np.asarray(fwhm, dtype=float)))
-    if len(widths) != n:
-        raise ValueError(f"shape {shape!r} needs {n} FWHM value(s), got {len(widths)}.")
-    return func, widths
+_SHAPES = {"gaussian": gaussian, "lorentzian": lorentzian}
 
 
 def broaden(
     energies: np.ndarray,
     strengths: np.ndarray,
     grid: np.ndarray,
-    fwhm: Width,
+    fwhm: float,
     shape: str = "gaussian",
 ) -> np.ndarray:
-    """sum_i s_i * g(grid - E_i), g area-normalised (so integral = sum_i s_i on a wide grid).
-
-    ``fwhm`` is one width, or ``(fwhm_gauss, fwhm_lorentz)`` for ``shape="voigt"`` / ``"pseudo_voigt"``.
-    """
-    func, widths = _lineshape(shape, fwhm)
+    """sum_i s_i * g(grid - E_i), g area-normalised (so integral = sum_i s_i on a wide grid)."""
     e = np.atleast_1d(np.asarray(energies, dtype=float))[:, None]
     s = np.atleast_1d(np.asarray(strengths, dtype=float))
-    return s @ func(np.asarray(grid, dtype=float)[None, :], e, *widths)
+    return s @ _SHAPES[shape](np.asarray(grid, dtype=float)[None, :], e, fwhm)
 
 
 def ensemble_sticks(frames: Iterable[tuple[np.ndarray, np.ndarray]]) -> tuple[np.ndarray, np.ndarray]:
@@ -169,19 +77,18 @@ def ensemble_sticks(frames: Iterable[tuple[np.ndarray, np.ndarray]]) -> tuple[np
     return e, s
 
 
-def _to_cm1(energies: np.ndarray, grid: np.ndarray, fwhm: Width, unit: str) -> tuple:
+def _to_cm1(energies: np.ndarray, grid: np.ndarray, fwhm: float, unit: str) -> tuple:
     if unit not in ("ev", "cm-1"):
         raise ValueError("unit must be 'ev' or 'cm-1'")
     fac = convert_energy_unit(1.0, unit, "cm-1")  # linear, so widths scale the same way
-    w = np.asarray(fwhm, dtype=float) * fac
-    return np.asarray(energies, dtype=float) * fac, np.asarray(grid, dtype=float) * fac, tuple(np.atleast_1d(w))
+    return np.asarray(energies, dtype=float) * fac, np.asarray(grid, dtype=float) * fac, fwhm * fac
 
 
 def spectrum(
     energies: np.ndarray,
     strengths: np.ndarray,
     grid: np.ndarray,
-    fwhm: Width,
+    fwhm: float,
     unit: str = "ev",
     shape: str = "gaussian",
 ) -> Spectrum:
@@ -193,7 +100,7 @@ def epsilon_spectrum(
     energies: np.ndarray,
     f: np.ndarray,
     grid: np.ndarray,
-    fwhm: Width,
+    fwhm: float,
     unit: str = "ev",
     shape: str = "gaussian",
 ) -> Spectrum:
@@ -210,7 +117,7 @@ def delta_epsilon_spectrum(
     energies: np.ndarray,
     r: np.ndarray,
     grid: np.ndarray,
-    fwhm: Width,
+    fwhm: float,
     unit: str = "ev",
     shape: str = "gaussian",
 ) -> Spectrum:
@@ -231,7 +138,7 @@ def epsilon_spectrum_from_d(
     energies: np.ndarray,
     d: np.ndarray,
     grid: np.ndarray,
-    fwhm: Width,
+    fwhm: float,
     unit: str = "ev",
     shape: str = "gaussian",
 ) -> Spectrum:
@@ -247,7 +154,7 @@ def emission_spectrum(
     energies: np.ndarray,
     strengths: np.ndarray,
     grid: np.ndarray,
-    fwhm: Width,
+    fwhm: float,
     unit: str = "ev",
     shape: str = "gaussian",
 ) -> Spectrum:
