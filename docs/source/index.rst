@@ -1,61 +1,70 @@
-pystda Documentation
-=========================
+spectralib: A Dataset for Luminescence and Circularly Polarized Luminescence Spectra
+====================================================================================
 
-.. code-block:: text
+.. image:: ../../imgs/spectralib_logo.svg
+   :alt: spectralib logo
+   :width: 320px
 
-                    _      _
-    _ __  _   _ ___| |_ __| | __ _
-   | '_ \| | | / __| __/ _` |/ _` |
-   | |_) | |_| \__ \ || (_| | (_| |
-   | .__/ \__, |___/\__\__,_|\__,_|
-   |_|    |___/
+This project contains:
 
-**pystda** is a Python-based implementation of simplified time-dependent quantum chemical (sQC) methods.
+- Experimental luminescence (``data/spectra/*LUM.csv``) and CPL (``data/spectra/*CPL.csv``) spectra.
+- Molecular structures (``data/structures/*.xyz``) in xyz format.
+- ``spectralib``, a small Python library to read and validate the data, broaden stick spectra and compare calculated with
+  experimental spectra.
 
-A rough overview of the modular components of the code is provided below.
+The source code and the dataset are hosted at `gitlab.git.nrw/rwth-bannwarthlab/cpl50
+<https://gitlab.git.nrw/rwth-bannwarthlab/cpl50>`__.
 
-.. image:: ../../imgs/module_overview.png
+Quick Start
+-----------
 
-The ground-state reference calculation can be carried out with an external program and passed to **pystda** as a molden file.
-Alternatively, a ground-state calculation based on a provided geometry (keyword `geom`) can be performed via **pyscf**.
+.. code-block:: bash
 
-Currently, we support a variety of different methods:
+   git clone https://gitlab.git.nrw/rwth-bannwarthlab/cpl50.git
+   cd cpl50
+   conda env create -f environment.yml
+   conda activate spectralib
 
-* TDA and TD-DFT
-* sTDA :cite:`grimmeSimplifiedTammDancoffDensity2013a` and sTD-DFT :cite:`bannwarthSimplifiedTimedependentDensity2014a`, their exact-integral variants (XsTDA, XsTD-DFT) :cite:`dewergifosseEXactIntegralSimplified2024b` and the RI-based TDA-ris, TDDFT-ris (``tda-ri``/``tddft-ri``) :cite:`zhouMinimalAuxiliaryBasis2023b`
-* hole-hole TDA (based on an N+2 reference or an N electron FON reference) :cite:`yuInitioNonadiabaticMolecular2020b,bannwarthHoleHoleTamm2020b` and particle-particle TDA[:red:`Add WT Ref`]
+.. code-block:: python
 
-``pystda`` provides a dense (full) solver to compute optical spectra across broad energy ranges or a iterative solver to compute a selected number of excited-states.
-Both solvers support different configuration selection techniques:
-* MO window - Set an energy window for active MOs 
-* PT2 - Configuration selection as carried out in sTDA (see :cite:`grimmeSimplifiedTammDancoffDensity2013a`). Divides configurations into primary, secondary, or neglected.
-* Ktrunc - Reduces 'active' MOs in the exchange integrals (ij|ab) and (ib|ja) by an explicit cutoff (:red:`ZZ precond paper`)
+   from spectralib import read_spectrum
+   from spectralib.dataset import summarize_dataset
+   from spectralib.plotting import plot_spectrum
 
-A run is configured on the command line, through a TOML input file, or both -- see
-:doc:`usage`.
+   summarize_dataset("data/spectra")                  # all spectra with their header information
+   spec = read_spectrum("data/spectra/9/9_CPL.csv")   # x in nm, y, and the header as spec.metadata
+   print(spec.metadata["molname"], spec.metadata["DOI"])
+   plot_spectrum(spec.convert_x("ev", jacobian=True))
 
-.. code-block:: console
+See :doc:`installation` for pip, uv and Anaconda Navigator, and :doc:`dataset` for the file format.
 
-   $ pystda --method stddft --geom coord.xyz --basis def2-svp --fct pbe0 --ethr 7.0
-   $ plotter stddft.dat --FWHM 0.2
-
-.. Definition of TOC
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   usage
-
+   installation
+   dataset
    data
-
-   examples
-
+   usage
+   testing
    code
-
    references
 
+How to Cite
+-----------
+
+Please see the corresponding publication (N. Maser, M. Pauls, G. Feldmann, C. Bannwarth, *manuscript in preparation*)
+for additional information.
+
+How to Contribute
+-----------------
+
+We encourage you to complement and extend this dataset. To do so, just create an issue on
+`GitLab <https://gitlab.git.nrw/rwth-bannwarthlab/cpl50/-/issues>`__ and ensure that your data passes the tests
+(:doc:`testing`) - that's it!
+
 Indices and Tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

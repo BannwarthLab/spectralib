@@ -1,6 +1,6 @@
-r"""Spectroscopic prefactors built from the ``tcgm_unitkit`` physical constants.
+r"""Spectroscopic prefactors built from the ``unitkit`` physical constants (package ``tcgm-unitkit``).
 
-Energy-axis conversions use ``tcgm_unitkit.convert_energy_unit`` directly.
+Energy-axis conversions use ``unitkit.convert_energy_unit`` directly.
 
 Conventions for transition quantities:
 
@@ -15,8 +15,8 @@ With D and R in the same units, the dissymmetry factor is g = 4 R / D.
 from __future__ import annotations
 
 import numpy as np
-from tcgm_unitkit import convert_energy_unit, convert_length_unit
-from tcgm_unitkit.constants.physical_constants import (
+from unitkit import convert_energy_unit, convert_length_unit
+from unitkit.constants.physical_constants import (
     AVOGADRO_CONSTANT,
     ELECTRON_MASS,
     ELEMENTARY_CHARGE,
@@ -28,7 +28,7 @@ from tcgm_unitkit.constants.physical_constants import (
 
 _LN10 = np.log(10.0)
 
-# cgs constants (erg s, cm/s, esu) derived from the SI values in tcgm_unitkit
+# cgs constants (erg s, cm/s, esu) derived from the SI values in unitkit
 _H_CGS = H_PLANCK * 1e7
 _C_CGS = SPEED_OF_LIGHT * 1e2
 _ME_CGS = ELECTRON_MASS * 1e3

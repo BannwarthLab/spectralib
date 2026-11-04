@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import numpy as np
 from scipy.integrate import trapezoid
-from tcgm_unitkit import convert_energy_unit
+from unitkit import convert_energy_unit
 
-#: Energy-axis units (tcgm_unitkit spelling).
+#: Energy-axis units (unitkit spelling).
 X_UNITS = ("nm", "ev", "cm-1")
 
 
@@ -27,7 +27,7 @@ class Spectrum:
         x: Strictly increasing x values.
         y: y values, same shape as x.
         xunit: One of 'nm', 'ev', 'cm-1' (default 'nm' as in the dataset .csv files).
-        metadata: Header fields (see cpl50.io.read_spectrum).
+        metadata: Header fields (see spectralib.io.read_spectrum).
     """
 
     def __init__(self, x: np.ndarray, y: np.ndarray, xunit: str = "nm", metadata: dict | None = None) -> None:

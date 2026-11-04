@@ -21,7 +21,8 @@ import numpy.typing as npt
 from scipy.integrate import trapezoid
 from scipy.optimize import linear_sum_assignment
 
-from cpl50.spectrum import Spectrum
+from spectralib.broadening import gaussian
+from spectralib.spectrum import Spectrum
 
 _N = 2000
 
@@ -200,8 +201,7 @@ def signs_match(ref: Spectrum, calc: Spectrum) -> bool:
 
 def smooth(spec: Spectrum, fwhm: float) -> Spectrum:
     """Convolve with an area-normalised Gaussian of the given FWHM (x units); works on non-uniform x."""
-    sigma = fwhm / (2.0 * np.sqrt(2.0 * np.log(2.0)))
-    kern = np.exp(-0.5 * ((spec.x[:, None] - spec.x[None, :]) / sigma) ** 2)
+    kern = gaussian(spec.x[:, None], spec.x[None, :], fwhm)
     y = trapezoid(kern * spec.y[None, :], spec.x, axis=1) / trapezoid(kern, spec.x, axis=1)
     return Spectrum(spec.x, y, spec.xunit, spec.metadata)
 

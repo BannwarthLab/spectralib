@@ -3,26 +3,31 @@
 # =============================================================================
 import os
 import shutil
+import sys
 from importlib.metadata import entry_points
-from pathlib import Path
 
 import pytest
+from conftest import DATA
 
 try:
-    from cpl50.scripts.compute_fingerprints import main
+    from spectralib.scripts.compute_fingerprints import main
 except ImportError:  # 'fingerprint' extra not installed; never skip silently in CI
-    if os.environ.get("CI"):
+    # MolBar publishes no Windows wheel, so the extra is incomplete there by design.
+    if os.environ.get("CI") and sys.platform != "win32":
         raise
-    pytest.skip("requires cpl50[fingerprint]", allow_module_level=True)
+    pytest.skip("requires spectralib[fingerprint] (unavailable on Windows)", allow_module_level=True)
 
-DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "structures"
+DATA_DIR = DATA / "structures"
 XYZ = sorted(DATA_DIR.rglob("*.xyz"))
 KINDS = ("molbar", "inchi")
+
+# the references under test live in the dataset
+pytestmark = pytest.mark.dataset
 
 
 def test_console_script_registered():
     eps = entry_points(group="console_scripts", name="comp_fingerprints")
-    assert eps, "comp_fingerprints not registered, reinstall cpl50"
+    assert eps, "comp_fingerprints not registered, reinstall spectralib"
     assert next(iter(eps)).load() is main
 
 

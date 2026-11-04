@@ -16,12 +16,12 @@ normalisation and interpolation.
    :recursive:
    :nosignatures:
 
-   cpl50.spectrum
+   spectralib.spectrum
 
 Units
 -----
 
-Prefactors for :math:`\varepsilon` and :math:`\Delta\varepsilon` from the ``tcgm_unitkit`` constants,
+Prefactors for :math:`\varepsilon` and :math:`\Delta\varepsilon` from the ``unitkit`` constants,
 :math:`f \rightarrow D` and :math:`g = 4R/D`.
 
 .. autosummary::
@@ -29,12 +29,12 @@ Prefactors for :math:`\varepsilon` and :math:`\Delta\varepsilon` from the ``tcgm
    :recursive:
    :nosignatures:
 
-   cpl50.units
+   spectralib.units
 
 Broadening
 ----------
 
-Gaussian/Lorentzian broadening (FWHM), ensemble averaging of sticks, :math:`\varepsilon` and :math:`\Delta\varepsilon`
+Gaussian, Lorentzian, Voigt and pseudo-Voigt broadening (FWHM), ensemble averaging of sticks, :math:`\varepsilon` and :math:`\Delta\varepsilon`
 spectra and emission profiles.
 
 .. autosummary::
@@ -42,7 +42,7 @@ spectra and emission profiles.
    :recursive:
    :nosignatures:
 
-   cpl50.broadening
+   spectralib.broadening
 
 Metrics
 -------
@@ -55,19 +55,31 @@ sign and ``benchmark``.
    :recursive:
    :nosignatures:
 
-   cpl50.metrics
+   spectralib.metrics
 
 IO / Parsing
 ------------
 
-Dataset parsers and header validation, dataset summaries, ``.CHRG``/``.UHF`` readers.
+Reading and writing spectra and structures, header validation, ``.CHRG``/``.UHF`` readers.
 
 .. autosummary::
    :toctree: _generated/
    :recursive:
    :nosignatures:
 
-   cpl50.io
+   spectralib.io
+
+Dataset
+-------
+
+Header metadata of all spectra, a printed dataset summary and simple queries (solvents, filters).
+
+.. autosummary::
+   :toctree: _generated/
+   :recursive:
+   :nosignatures:
+
+   spectralib.dataset
 
 Utilities
 ---------
@@ -79,7 +91,7 @@ Header registries (required fields, DOI pattern, accepted solvents), solvent can
    :recursive:
    :nosignatures:
 
-   cpl50.utils
+   spectralib.utils
 
 Plotting
 --------
@@ -91,4 +103,4 @@ Matplotlib helpers (optional dependency).
    :recursive:
    :nosignatures:
 
-   cpl50.plotting
+   spectralib.plotting

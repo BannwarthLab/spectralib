@@ -1,7 +1,3 @@
-include:
-  - local: .gitlab/common-scripts.yml
-
-
 .pre_install:
   script:
     - set -e
@@ -28,12 +24,18 @@ stages:
   IMAGE_NAME: ""
   CONTAINER_NAME: "${OS}-${PYTHON}"
   APPTAINER_RECIPE: "${CONTAINER_NAME}.def"
-  APPTAINER_RECIPE_GENERATE_CMD: "touch .gitconfig_build && python3 .gitlab/generate_recipe.py ${CONTAINER_NAME}"
+  APPTAINER_RECIPE_GENERATE_CMD: "python3 .gitlab/generate_recipe.py ${CONTAINER_NAME}"
 
 # Main container building
+# tcgm-unitkit is public, so the image is built from the recipe alone -- no CI
+# token or git credentials have to be injected to resolve the dependency.
 build-containers:
   stage: build-container
-  extends: .build_container
+  script:
+    - export CONTAINER_NAME="${OS}-${PYTHON}"
+    - echo ${CONTAINER_NAME}
+    - python3 .gitlab/generate_recipe.py ${CONTAINER_NAME}
+    - /gitlab-runner/build_container.sh ${CONTAINER_NAME}.def
   tags:
     - shell
   <<: *matrix
@@ -89,11 +91,17 @@ main-test-pytest:
     APPTAINER_EXEC_ARGS: "--bind $CI_PROJECT_DIR:$CI_PROJECT_DIR"
     APPTAINER_BIND: "$CI_PROJECT_DIR:$CI_PROJECT_DIR"
   script:
-    - pytest tests/ --cov=cpl50 --cov-report term --cov-report xml:coverage.xml --cov-report html:htmlcov
+    - pytest tests/ --cov=spectralib --cov-report term --cov-report xml:coverage.xml --cov-report html:htmlcov
+
+  # Feeds the coverage badge: GitLab reads the number out of the job log. The
+  # cobertura report below only drives the per-line annotations in merge requests.
+  coverage: '/(?i)total.*? (100(?:\.0+)?%|[1-9]?\d(?:\.\d+)?%)$/'
 
   artifacts:
     paths:
       - htmlcov/
+      # Downloadable as well as a report, so `pages` can render the badge from it.
+      - coverage.xml
     reports:
       coverage_report:
         coverage_format: cobertura
@@ -115,7 +123,7 @@ documentation-build:
   tags:
     - cpu
   script:
-    - sphinx-build -b html docs/source docs/_build
+    - sphinx-build -b html docs/source docs/_build -W --keep-going
 
   artifacts:
     paths:
@@ -127,6 +135,13 @@ pages:
   image: "${CONTAINER_NAME}"
   needs:
     - job: documentation-build
+      artifacts: true
+    # Pinned to a single job for the badge showing job coverage
+    - job: main-test-pytest
+      parallel:
+        matrix:
+          - OS: "RL10"
+            PYTHON: "python3.13"
       artifacts: true
   before_script:
     - !reference [.pre_install, script]
@@ -140,6 +155,9 @@ pages:
   script:
     - mkdir -p public
     - mv docs/_build/* public/
+    # GitLab's own coverage badge needs a login on this instance, so publish our
+    # own next to the docs.
+    - python3 .gitlab/coverage_badge.py coverage.xml public/coverage.svg
   rules:
     - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
   artifacts:

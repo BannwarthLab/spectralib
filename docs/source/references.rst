@@ -1,4 +1,4 @@
 References
 ===============
 
-.. bibliography:: lit.bib cpl50.bib
+.. bibliography:: lit.bib spectralib.bib

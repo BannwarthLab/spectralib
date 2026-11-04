@@ -1,10 +1,10 @@
 # =============================================================================
-# test_units.py  –  spectroscopic prefactors (unit conversion itself is tested in tcgm_unitkit)
+# test_units.py  –  spectroscopic prefactors (unit conversion itself is tested in tcgm-unitkit)
 # =============================================================================
 import pytest
-from tcgm_unitkit import convert_energy_unit
+from unitkit import convert_energy_unit
 
-from cpl50.units import (
+from spectralib.units import (
     K_DEPS,
     K_EPS,
     K_EPS_D,

@@ -1,4 +1,4 @@
-"""Matplotlib helpers (optional dependency: pip install cpl50[plot])."""
+"""Matplotlib helpers (optional dependency: pip install spectralib[plot])."""
 
 from __future__ import annotations
 
@@ -7,9 +7,9 @@ from typing import TYPE_CHECKING
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
-from tcgm_unitkit import convert_energy_unit
+from unitkit import convert_energy_unit
 
-from cpl50.spectrum import Spectrum
+from spectralib.spectrum import Spectrum
 
 if TYPE_CHECKING:
     from matplotlib.axes._secondary_axes import SecondaryAxis

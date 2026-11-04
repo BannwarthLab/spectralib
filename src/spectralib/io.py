@@ -3,15 +3,12 @@
 from __future__ import annotations
 
 import csv
-import re
-from collections import Counter
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 
-from cpl50.spectrum import Spectrum
-from cpl50.utils import (
+from spectralib.spectrum import Spectrum
+from spectralib.utils import (
     DOI_REGEX,
     REQUIRED_FIELDS,
     VALID_QUANT_CP,
@@ -22,11 +19,11 @@ from cpl50.utils import (
 )
 
 
-def read_spectrum(path: str) -> Spectrum:
+def read_spectrum(path: str | Path) -> Spectrum:
     """Read spectrum from .csv file and check for valid header data.
 
     Args:
-        path (str): Path to the .csv file.
+        path (str | Path): Path to the .csv file.
 
     Returns:
         Spectrum: Dataclass containing x, y arrays and the header as metadata dict.
@@ -47,7 +44,7 @@ def read_spectrum(path: str) -> Spectrum:
         raise ValueError(f"Header must have 8 fields, got {len(parts)} in {path}")
 
     hdict = dict(zip(REQUIRED_FIELDS, parts))
-    hdict["file"] = path
+    hdict["file"] = str(path)
 
     # Check validity of entries
     _validate_header(hdict)
@@ -249,7 +246,8 @@ def write_spectrum(
     if missing:
         raise ValueError(f"Spectrum metadata missing required fields: {missing}")
 
-    _validate_header(spectrum.metadata)
+    # file type (LUM/CPL) is inferred from the target name, so metadata needs no 'file' entry
+    _validate_header({**spectrum.metadata, "file": str(path)})
 
     # ------------------------------------------------------------------
     # Build header line
@@ -279,273 +277,14 @@ def write_spectrum(
         )
 
 
-# ---------------------------------------------------------------------
-# Dataset loading
-# ---------------------------------------------------------------------
-
-_ID_RE = re.compile(r"^(\d+)")
-
-
-def _id(path: Path) -> int | None:
-    """Extract leading numeric ID from filename."""
-    m = _ID_RE.match(path.stem)
-    return int(m.group(1)) if m else None
-
-
-def _sort_key(path: Path) -> tuple:
-    """Sort by leading numeric ID, then filename."""
-    mol_id = _id(path)
-    return (mol_id if mol_id is not None else float("inf"), path.stem)
-
-
-def _clean(value: str) -> str:
-    """Normalize sentinel values."""
-    if value == "0":
-        return "-"
-    return value.lower()
-
-
-def load_dataset_metadata(
-    spectra_dir: str,
-    select: list[int] | None = None,
-) -> list[dict[str, Any]]:
-    """
-    Load metadata records from all spectra.
-
-    Args:
-        spectra_dir:
-            Root directory containing CSV spectra.
-
-        select:
-            Optional list of molecule IDs to include.
-
-    Returns:
-        List of metadata dictionaries.
-    """
-
-    spectra_path = Path(spectra_dir)
-
-    files = sorted(
-        spectra_path.rglob("*.csv"),
-        key=_sort_key,
-    )
-
-    if select is not None:
-        select_set = set(select)
-        files = [f for f in files if _id(f) in select_set]
-
-    records = []
-
-    for file in files:
-        try:
-            spec = read_spectrum(str(file))
-            m = spec.metadata
-
-            records.append(
-                {
-                    "id": _id(file),
-                    "file": file.name,
-                    "path": str(file),
-                    "mol": _clean(m["molname"]),
-                    "doi": _clean(m["DOI"]),
-                    "T": _clean(m["T"]),
-                    "c": _clean(m["c"]),
-                    "solv": _clean(m["solv"]),
-                    "irrad": _clean(m["irrad"]),
-                    "quant": _clean(m["quant"]),
-                    "unit": _clean(m["unit"]),
-                }
-            )
-
-        except (ValueError, OSError) as exc:
-            records.append(
-                {
-                    "id": _id(file),
-                    "file": file.name,
-                    "error": str(exc),
-                }
-            )
-
-    return records
-
-
-# ---------------------------------------------------------------------
-# Pretty summary printer
-# ---------------------------------------------------------------------
-
-
-def summarize_dataset(
-    records: str | Path | list[dict[str, Any]],
-    columns: list[str] | None = None,
-) -> None:
-    """
-    Pretty-print dataset summary.
-
-    Args:
-        records:
-            Either a path to a spectra directory or the output from
-            load_dataset_metadata().
-
-        columns:
-            Columns to display.
-    """
-
-    if isinstance(records, (str, Path)):
-        records = load_dataset_metadata(str(records))
-
-    COLS: dict[str, dict[str, Any]] = {
-        "file": {"title": "File", "width": 20},
-        "mol": {"title": "Molecule", "width": 16},
-        "doi": {"title": "DOI", "width": 36},
-        "T": {"title": "T (K)", "width": 10},
-        "c": {"title": "c (M)", "width": 10},
-        "solv": {"title": "Solvent", "width": 14},
-        "irrad": {"title": "λirr (nm)", "width": 10},
-        "quant": {"title": "Quant", "width": 8},
-        "unit": {"title": "Unit", "width": 8},
-    }
-
-    DEFAULT_COLUMNS = [
-        "file",
-        "mol",
-        "doi",
-        "T",
-        "c",
-        "solv",
-        "irrad",
-        "quant",
-        "unit",
-    ]
-
-    if columns is None:
-        columns = DEFAULT_COLUMNS
-
-    invalid = [c for c in columns if c not in COLS]
-    if invalid:
-        raise ValueError(f"Unknown columns: {invalid}")
-
-    def trunc(s: str, width: int) -> str:
-        s = str(s)
-        return s if len(s) <= width else s[: width - 1] + "…"
-
-    def row(values: dict[str, Any]) -> str:
-
-        parts = []
-
-        for col in columns:
-            width = COLS[col]["width"]
-            val = str(values.get(col, "-"))
-
-            if col in {"file", "mol", "doi", "solv"}:
-                val = trunc(val, width)
-
-            parts.append(f"{val:{width}}")
-
-        return "  " + "  ".join(parts)
-
-    header = row({c: COLS[c]["title"] for c in columns})
-
-    sep_width = sum(COLS[c]["width"] for c in columns) + 2 * len(columns)
-    separator = "-" * sep_width
-
-    print()
-    print("  CPL50 Dataset Summary")
-    print(f"  {len(records)} records")
-    print()
-    print(header)
-    print(separator)
-
-    n_ok = 0
-    n_err = 0
-
-    for rec in records:
-        if "error" in rec:
-            print(f"  ERROR  {rec['file']}: {rec['error']}")
-            n_err += 1
-            continue
-
-        print(row(rec))
-        n_ok += 1
-
-    print(separator)
-    print(f"  {n_ok} parsed successfully, {n_err} error(s).")
-    print()
-
-
-# ---------------------------------------------------------------------
-# Query helpers
-# ---------------------------------------------------------------------
-
-
-def get_solvents(
-    records: list[dict[str, Any]],
-    unique: bool = False,
-) -> list[str]:
-    """
-    Return the solvents of all records (unique=True: sorted, without repeats).
-    """
-
-    solvents = [r["solv"] for r in records if "solv" in r and r["solv"] not in {"-", ""}]
-    return sorted(set(solvents)) if unique else solvents
-
-
-def count_solvents(
-    records: list[dict[str, Any]],
-) -> Counter:
-    """
-    Count solvent occurrences.
-    """
-
-    return Counter(r["solv"] for r in records if "solv" in r and r["solv"] not in {"-", ""})
-
-
-def filter_records(
-    records: list[dict[str, Any]],
-    **criteria,
-) -> list[dict[str, Any]]:
-    """
-    Filter records by metadata fields.
-
-    Example:
-        filter_records(records, solv="methanol")
-    """
-
-    out = []
-
-    for r in records:
-        match = True
-
-        for key, value in criteria.items():
-            if r.get(key) != value:
-                match = False
-                break
-
-        if match:
-            out.append(r)
-
-    return out
-
-
-def get_solvents_by_molecule(records: list[dict[str, Any]]) -> dict[int, str]:
-    """
-    Return one solvent per molecule ID.
-    """
-
-    solvents = {}
-
-    for r in records:
-        if "solv" not in r:
-            continue
-
-        mol_id = r["id"]
-        solv = r["solv"]
-
-        if solv in {"-", ""}:
-            continue
-
-        solvents[mol_id] = solv
-
-    return solvents
+def _read_int(path: Path, default: int = 0) -> int:
+    """First integer in ``path``, ``default`` if the file does not exist."""
+    if not path.is_file():
+        return default
+    tokens = path.read_text().split()
+    if not tokens:
+        raise ValueError(f"{path} is empty")
+    return int(tokens[0])
 
 
 def read_charge_uhf(struct_dir: str | Path) -> tuple[int, int]:
@@ -553,10 +292,9 @@ def read_charge_uhf(struct_dir: str | Path) -> tuple[int, int]:
 
     Args:
         struct_dir: Structure folder, e.g. ``data/structures/29``.
+
+    Raises:
+        ValueError: If a ``.CHRG``/``.UHF`` file is empty or does not start with an integer.
     """
     d = Path(struct_dir)
-    chrg, uhf = d / ".CHRG", d / ".UHF"
-    return (
-        int(chrg.read_text().split()[0]) if chrg.exists() else 0,
-        int(uhf.read_text().split()[0]) if uhf.exists() else 0,
-    )
+    return _read_int(d / ".CHRG"), _read_int(d / ".UHF")
