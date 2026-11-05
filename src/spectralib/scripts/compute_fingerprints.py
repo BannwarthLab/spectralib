@@ -18,6 +18,8 @@ from joblib import Parallel, cpu_count, delayed
 from molbar.barcode import CalculationError, get_molbar_from_file
 from openbabel import pybel
 
+from spectralib.io import read_charge_uhf
+
 _TTY = sys.stdout.isatty()
 OK = "\033[92m[ OK ]\033[0m" if _TTY else "[ OK ]"
 FAIL = "\033[91m[FAIL]\033[0m" if _TTY else "[FAIL]"
@@ -32,17 +34,11 @@ def find_xyz(target: Path) -> list[Path]:
     return [target] if target.is_file() else sorted(target.rglob("*.xyz"), key=_natural_key)
 
 
-def read_charge_uhf(xyz: Path) -> tuple[int, int]:
-    """Read total charge and unpaired electrons from .CHRG / .UHF next to ``xyz``."""
-    chrg, uhf = xyz.parent / ".CHRG", xyz.parent / ".UHF"
-    return (int(chrg.read_text()) if chrg.is_file() else 0, int(uhf.read_text()) if uhf.is_file() else 0)
-
-
 def fingerprint(xyz: Path) -> tuple[Path, str, dict[str, str], dict[str, str]]:
     """Compute MolBar and InChI for one structure. Returns (xyz, state, results, errors)."""
     pybel.ob.obErrorLog.StopLogging()  # failures are reported via the return value
     try:
-        charge, uhf = read_charge_uhf(xyz)
+        charge, uhf = read_charge_uhf(xyz.parent)
     except ValueError as e:
         return xyz, "", {}, {".CHRG/.UHF": str(e)}
 

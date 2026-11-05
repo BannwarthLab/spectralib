@@ -54,8 +54,7 @@ def generate_recipe(name: str) -> str:
 
     # Files section
     lines.append("%files")
-    lines.append("    . /opt/cpl50\n")
-    lines.append("    .gitconfig_build /etc/gitconfig\n")
+    lines.append("    . /opt/spectralib\n")
 
     # Post section
     lines.append("%post")
@@ -81,13 +80,8 @@ def generate_recipe(name: str) -> str:
 
         # Project package installation
         lines.append("    # Install project package and dev dependencies")
-        lines.append("    cd /opt/cpl50")
+        lines.append("    cd /opt/spectralib")
         lines.append('    pip install --no-cache-dir --upgrade --force-reinstall -e ".[dev,docs,fingerprint]"')
-        lines.append("")
-
-        # Clean up git config credentials inside image
-        lines.append("    # Clean git auth")
-        lines.append("    rm -f /etc/gitconfig")
         lines.append("")
 
     lines.append("    dnf clean all")

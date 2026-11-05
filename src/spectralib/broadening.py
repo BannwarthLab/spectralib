@@ -3,6 +3,7 @@
 All line shapes are area-normalised and parametrised by their FWHM, in the units of
 the energy grid. Stick energies, grid and FWHM must share one linear energy unit
 ('ev' or 'cm-1'); broadening on a wavelength grid is not supported (convert afterwards).
+
 """
 
 from __future__ import annotations
@@ -10,16 +11,22 @@ from __future__ import annotations
 from collections.abc import Iterable
 
 import numpy as np
-from tcgm_unitkit import convert_energy_unit
+from unitkit import convert_energy_unit
 
-from cpl50.spectrum import Spectrum
-from cpl50.units import K_DEPS, K_EPS, K_EPS_D
+from spectralib.spectrum import Spectrum
+from spectralib.units import CGS40, K_DEPS, K_EPS, K_EPS_D
 
 _FWHM_PER_SIGMA = 2.0 * np.sqrt(2.0 * np.log(2.0))
 
 
 def fwhm_from_sigma(sigma: float) -> float:
+    """FWHM of a Gaussian from its standard deviation (FWHM = 2 sqrt(2 ln 2) sigma)."""
     return sigma * _FWHM_PER_SIGMA
+
+
+def sigma_from_fwhm(fwhm: float) -> float:
+    """Standard deviation of a Gaussian from its FWHM (inverse of :func:`fwhm_from_sigma`)."""
+    return fwhm / _FWHM_PER_SIGMA
 
 
 def fwhm_from_fw1e(fw1e: float) -> float:
@@ -124,7 +131,7 @@ def delta_epsilon_spectrum(
     Same construction as eps written with dipole strengths, so delta_eps/eps -> 4R/D = g_abs.
     """
     e, x, w = _to_cm1(energies, grid, fwhm, unit)
-    return Spectrum(grid, K_DEPS * 1e-40 * x * broaden(e, r, x, w, shape), xunit=unit)
+    return Spectrum(grid, K_DEPS * CGS40 * x * broaden(e, r, x, w, shape), xunit=unit)
 
 
 def epsilon_spectrum_from_d(
@@ -140,7 +147,7 @@ def epsilon_spectrum_from_d(
     Use together with delta_epsilon_spectrum when the ratio delta_eps/eps (g_abs spectrum) is needed.
     """
     e, x, w = _to_cm1(energies, grid, fwhm, unit)
-    return Spectrum(grid, K_EPS_D * 1e-40 * x * broaden(e, d, x, w, shape), xunit=unit)
+    return Spectrum(grid, K_EPS_D * CGS40 * x * broaden(e, d, x, w, shape), xunit=unit)
 
 
 def emission_spectrum(

@@ -1,0 +1,24 @@
+# Conda environment for spectralib.
+#
+# Create with:   conda env create -f environment.yml
+# or import via Anaconda Navigator: Environments -> Import -> this file.
+#
+# Only conda-forge is used: the Anaconda "defaults" channel requires a paid
+# licence for large organisations. spectralib itself and tcgm-unitkit are installed
+# with pip, since they are distributed from git rather than from conda-forge.
+# git is listed so that pip can fetch tcgm-unitkit on machines without a
+# system git (most Windows and many macOS installations).
+name: spectralib
+channels:
+  - conda-forge
+dependencies:
+  - python >=3.12,<3.15
+  - numpy
+  - scipy
+  - matplotlib
+  - pytest
+  - jupyterlab
+  - git
+  - pip
+  - pip:
+      - -e .

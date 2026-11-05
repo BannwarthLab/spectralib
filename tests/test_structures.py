@@ -3,15 +3,18 @@
 # =============================================================================
 import itertools
 import re
-from pathlib import Path
 
 import numpy as np
 import pytest
+from conftest import DATA
 
-from cpl50.io import read_xyz
-from cpl50.utils import kabsch_rmsd
+from spectralib.io import read_xyz
+from spectralib.utils import kabsch_rmsd
 
 RMSD_DUPLICATE_THRESHOLD = 0.1  # Å — pairs below this are flagged as duplicates
+
+# every test here validates the dataset itself
+pytestmark = pytest.mark.dataset
 
 # ---------------------------------------------------------------------------
 # Helpers / fixtures
@@ -19,9 +22,9 @@ RMSD_DUPLICATE_THRESHOLD = 0.1  # Å — pairs below this are flagged as duplica
 
 @pytest.fixture(scope="module")
 def all_structures():
-    data_dir = Path(__file__).resolve().parents[1] / "data" / "structures"
+    data_dir = DATA / "structures"
     files = sorted(data_dir.rglob("*.xyz"))
-    assert files, "No .xyz files found in data/structures"
+    assert files, f"No .xyz files found in {data_dir}"
     return [(f, *read_xyz(str(f))) for f in files]
 
 

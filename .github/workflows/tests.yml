@@ -1,0 +1,106 @@
+# Cross-platform test matrix on the public GitHub mirror.
+#
+# The authoritative pipeline remains GitLab (.gitlab/.gitlab-ci.yml), which
+# tests the Apptainer/Rocky Linux images used on the HPC cluster. This workflow
+# covers what GitLab cannot: Windows and macOS, and installation through conda.
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  # Plain pip install, the baseline for all three platforms.
+  pip:
+    name: pip (${{ matrix.os }}, py${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.12", "3.13", "3.14"]
+    runs-on: ${{ matrix.os }}
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e ".[dev]"
+      - run: pytest tests -v
+
+  # The documented Anaconda route: solve environment.yml, then run the suite.
+  conda:
+    name: conda (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      CI: "true"
+    defaults:
+      run:
+        # Required by setup-miniconda to activate the environment; without it
+        # the system Python is used and the job passes without testing anything.
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-version: latest
+          environment-file: environment.yml
+          activate-environment: spectralib
+      - name: Report environment
+        run: |
+          conda info
+          python -c "import spectralib, numpy, scipy; print(spectralib.__file__)"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests -v
+
+  # Fingerprint tools: MolBar publishes no Windows wheel, so Linux/macOS only.
+  fingerprint:
+    name: fingerprint (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      CI: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -e ".[dev,fingerprint]"
+      - run: pytest tests/test_fingerprints.py -v
+
+  # Build the distributions and install the wheel into a clean environment on
+  # every platform, so a broken or incomplete build is caught here.
+  build:
+    name: build + install wheel (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        # Git Bash on Windows too, so that the dist/*.whl globs expand.
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install build twine pytest
+      - run: python -m build
+      - run: twine check dist/*
+      - name: Install the built wheel and import it
+        run: |
+          pip install --force-reinstall dist/*.whl
+          python -c "import spectralib; print(spectralib.__version__ if hasattr(spectralib, '__version__') else 'ok')"
+      - name: Library tests against the installed package
+        run: pytest tests -v -m "not dataset"

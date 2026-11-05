@@ -4,7 +4,7 @@
 import numpy as np
 import pytest
 
-from cpl50.metrics import (
+from spectralib.metrics import (
     benchmark,
     cosine,
     dominant_sign,
@@ -16,7 +16,7 @@ from cpl50.metrics import (
     sign_ratio,
     signs_match,
 )
-from cpl50.spectrum import Spectrum
+from spectralib.spectrum import Spectrum
 
 X = np.linspace(1.5, 3.5, 801)
 

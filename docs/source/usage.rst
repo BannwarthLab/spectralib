@@ -12,8 +12,8 @@ Python Library
        normalisation, interpolation
    * - ``units``
      - Prefactors for :math:`\varepsilon` and :math:`\Delta\varepsilon` from the
-       `tcgm_unitkit <https://gitlab.git.nrw/rwth-bannwarthlab/utils/tcgm_unitkit>`__ constants;
-       :math:`f\rightarrow D`; :math:`g = 4R/D` (axis conversions use ``tcgm_unitkit.convert_energy_unit``)
+       `tcgm-unitkit <https://gitlab.git.nrw/rwth-bannwarthlab/tcgm-unitkit>`__ constants;
+       :math:`f\rightarrow D`; :math:`g = 4R/D` (axis conversions use ``unitkit.convert_energy_unit``)
    * - ``broadening``
      - Gaussian/Lorentzian broadening (FWHM), ensemble averaging of sticks, :math:`\varepsilon` and
        :math:`\Delta\varepsilon` in L mol\ :sup:`-1` cm\ :sup:`-1`, emission profiles
@@ -21,24 +21,26 @@ Python Library
      - Cosine similarity, lobe-resolved cosines, :math:`E_\mathrm{spe}`, :math:`E_\mathrm{ene}`, optimal shift,
        main-band sign, ``benchmark``
    * - ``io``
-     - Dataset parsers/validation, ``.CHRG``/``.UHF``
+     - Read/write spectra (with header validation) and structures, ``.CHRG``/``.UHF``
+   * - ``dataset``
+     - Metadata of all spectra, dataset summary, queries (solvents, filters)
    * - ``plotting``
      - Matplotlib helpers (``pip install -e ".[plot]"``)
 
 The library works on plain arrays (energies in eV, :math:`f`, :math:`R` in :math:`10^{-40}` esu\ :sup:`2` cm\ :sup:`2`).
 Quantum-chemistry output is read with `tcgmio <https://gitlab.git.nrw/rwth-bannwarthlab/utils/tcgmio>`__, which is
-not a dependency of ``cpl50``.
+not a dependency of ``spectralib``.
 
 .. code-block:: python
 
    import numpy as np
-   from tcgm_unitkit import convert_energy_unit
+   from unitkit import convert_energy_unit
    from tcgmio.orca import read_orca_opa_spectrum
 
-   from cpl50 import read_spectrum
-   from cpl50.broadening import delta_epsilon_spectrum, emission_spectrum, epsilon_spectrum
-   from cpl50.metrics import benchmark
-   from cpl50.units import osc_to_dipole_strength
+   from spectralib import read_spectrum
+   from spectralib.broadening import delta_epsilon_spectrum, emission_spectrum, epsilon_spectrum
+   from spectralib.metrics import benchmark
+   from spectralib.units import osc_to_dipole_strength
 
    grid = np.linspace(1.5, 6.0, 2000)                                   # eV
    _, _, e_cm, f, _ = read_orca_opa_spectrum("orca.out")                # cm-1, dimensionless

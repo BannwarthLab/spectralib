@@ -1,0 +1,26 @@
+/* Force tables to take 100% width and prevent horizontal scrolling */
+.rst-content table.docutils {
+    width: 100% !important;
+    table-layout: fixed !important;
+    display: table !important;
+    overflow-x: visible !important;
+}
+
+/* Allow cells to wrap words naturally and break long code blocks */
+.rst-content table.docutils td, 
+.rst-content table.docutils th {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* Prevent inline code snippets from overflowing table cells */
+.rst-content table.docutils td code {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+}
+
+/* Expand the main content container to 100% width */
+/* .wy-nav-content { */
+    /* max-width: 100% !important; */
+/* } */

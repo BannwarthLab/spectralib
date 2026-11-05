@@ -9,32 +9,8 @@ import numpy as np
 # Required fields tested for in the header of all spectrum data
 REQUIRED_FIELDS = ["DOI", "molname", "T", "c", "solv", "irrad", "quant", "unit"]
 
-# -----  Registry of valid keys within the header in CPL50  ----- #
+# -----  Registry of valid keys within the header in spectralib  ----- #
 DOI_REGEX = re.compile(r"^10\.\d{4,9}/[-._;()/:A-Z0-9]+$", re.IGNORECASE)
-
-
-VALID_SOLVENTS = {
-    "meoh",  # methanol
-    "ch3oh",
-    "etoh",  # ethanol
-    "h2o",  # water
-    "mecn",  # acetonitrile
-    "toluene",  # toluene
-    "tol",
-    "hexane",  # hexane
-    "dcm",  # dichloromethane
-    "ch2cl2",  # dcm
-    "chloroform",  # chloroform
-    "chcl3",
-    "p-dioxane",
-    "1-4-dioxane",
-    "dmf",
-    "chex",
-    "cyclohexane",
-    "ccl4",
-    "me-chex",
-    # "0",      # allow missing value
-}
 
 
 SOLVENT_ALIASES = {
@@ -69,6 +45,9 @@ SOLVENT_ALIASES = {
     "hexane": "hexane",
     "dmf": "dmf",
 }
+
+#: Accepted values of the ``solv`` header field (aliases, case-insensitive).
+VALID_SOLVENTS = frozenset(SOLVENT_ALIASES)
 
 DIELECTRIC_CONSTANTS = {  # https://comp.chem.umn.edu/solvation/mnsddb.pdf
     "carbon tetrachloride": 2.2280,

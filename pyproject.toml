@@ -3,7 +3,7 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "cpl50"
+name = "spectralib"
 version = "0.0.2"
 description = "Analysis Tools for LUM and CPL Dataset."
 readme = "README.md"
@@ -23,13 +23,13 @@ maintainers = [
 dependencies = [
     "numpy",
     "scipy",
-    "tcgm_unitkit @ git+ssh://git@gitlab.git.nrw/rwth-bannwarthlab/utils/tcgm_unitkit.git@main"
+    "tcgm-unitkit @ git+https://gitlab.git.nrw/rwth-bannwarthlab/tcgm-unitkit.git@main",
 ]
 
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "Operating System :: Unix",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Topic :: Scientific/Engineering :: Chemistry",
     "Topic :: Scientific/Engineering :: Physics",
@@ -41,11 +41,13 @@ plot = [
     "matplotlib",
 ]
 
-# pinned: the MolBar version is part of every barcode, InChI output depends on the Open Babel build
+# pinned: the MolBar version is part of every barcode, InChI output depends on the Open Babel build.
+# MolBar ships no Windows wheel, so the extra installs without it there and
+# comp_fingerprints is unavailable on Windows.
 fingerprint = [
     "joblib",
-    "molbar==1.2.0",
     "openbabel==3.2.1",
+    "molbar==1.2.0; sys_platform != 'win32'",
 ]
 
 dev = [
@@ -65,21 +67,23 @@ docs = [
 ]
 
 [project.scripts]
-comp_fingerprints = "cpl50.scripts.compute_fingerprints:main"
+comp_fingerprints = "spectralib.scripts.compute_fingerprints:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["cpl50*"]
+include = ["spectralib*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+markers = [
+    "dataset: requires the benchmark dataset in data/, i.e. a repository checkout",
+]
 
 [tool.mypy]
 exclude = ["docs"]
 ignore_missing_imports = true
 no_implicit_optional = false
-packages = "cpl50"
+packages = "spectralib"
 
 [tool.ruff]
 target-version = "py312"

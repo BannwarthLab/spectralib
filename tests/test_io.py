@@ -1,11 +1,11 @@
 # =============================================================================
 # test_io.py
 # =============================================================================
-from pathlib import Path
-
 import pytest
+from conftest import DATA
 
-from cpl50.io import REQUIRED_FIELDS, _validate_header, read_spectrum, summarize_dataset
+from spectralib.dataset import summarize_dataset
+from spectralib.io import REQUIRED_FIELDS, _validate_header, read_spectrum
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -132,10 +132,11 @@ def test_lum_filename_variants_route_correctly(valid_header, fname):
 # Integration: parse all real spectra
 # ---------------------------------------------------------------------------
 
+@pytest.mark.dataset
 def test_all_spectra_parse():
-    base = Path("data/spectra")
+    base = DATA / "spectra"
     csv_files = list(base.rglob("*.csv"))
-    assert csv_files, "No .csv files found under data/spectra"
+    assert csv_files, f"No .csv files found under {base}"
     for file in csv_files:
         read_spectrum(str(file))
 
@@ -169,3 +170,22 @@ def test_summary_sentinel_displayed_as_dash(tmp_path, capsys):
 def test_summary_empty_directory(tmp_path, capsys):
     summarize_dataset(str(tmp_path))
     assert "0 records" in capsys.readouterr().out
+
+# ---------------------------------------------------------------------------
+# write_spectrum
+# ---------------------------------------------------------------------------
+
+def test_write_spectrum_roundtrip_without_file_key(tmp_path):
+    """A Spectrum built in memory (no 'file' in metadata) can be written and read back."""
+    import numpy as np
+
+    from spectralib import Spectrum, write_spectrum
+
+    meta = dict(zip(REQUIRED_FIELDS, VALID_RAW.split(",")))
+    spec = Spectrum(np.array([400.0, 450.0, 500.0]), np.array([0.1, -0.2, 0.05]), metadata=meta)
+    out = tmp_path / "1_CPL.csv"
+    write_spectrum(spec, out)
+    back = read_spectrum(out)
+    np.testing.assert_allclose(back.x, spec.x)
+    np.testing.assert_allclose(back.y, spec.y)
+    assert back.metadata["DOI"] == meta["DOI"]

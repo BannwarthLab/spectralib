@@ -4,9 +4,9 @@
 import numpy as np
 import pytest
 from scipy.integrate import trapezoid
-from tcgm_unitkit import convert_energy_unit
+from unitkit import convert_energy_unit
 
-from cpl50.broadening import (
+from spectralib.broadening import (
     broaden,
     delta_epsilon_spectrum,
     emission_spectrum,
@@ -17,8 +17,9 @@ from cpl50.broadening import (
     fwhm_from_sigma,
     gaussian,
     lorentzian,
+    sigma_from_fwhm,
 )
-from cpl50.units import K_EPS, osc_to_dipole_strength
+from spectralib.units import K_EPS, osc_to_dipole_strength
 
 GRID = np.linspace(0.5, 8.0, 7501)
 
@@ -34,6 +35,7 @@ def test_lineshape_normalised_with_correct_fwhm(shape):
 
 def test_width_conversions():
     assert fwhm_from_sigma(1.0) == pytest.approx(2.35482, rel=1e-5)
+    assert sigma_from_fwhm(fwhm_from_sigma(0.7)) == pytest.approx(0.7)
     # Gaussian value at +-FW1e/2 is 1/e of the maximum
     fw1e = 0.5
     w = fwhm_from_fw1e(fw1e)
@@ -80,3 +82,4 @@ def test_emission_has_cubic_weight():
     spec = emission_spectrum([3.0], [1.0], GRID, 0.3)
     ref = GRID**3 * gaussian(GRID, 3.0, 0.3)
     assert spec.y == pytest.approx(ref)
+

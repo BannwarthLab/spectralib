@@ -3,10 +3,11 @@
 # =============================================================================
 import numpy as np
 import pytest
+from conftest import DATA
 from scipy.integrate import trapezoid
 
-from cpl50.io import read_spectrum
-from cpl50.spectrum import Spectrum
+from spectralib.io import read_spectrum
+from spectralib.spectrum import Spectrum
 
 
 def test_validation():
@@ -18,8 +19,9 @@ def test_validation():
         Spectrum(np.array([1.0, 2.0]), np.array([1.0, 1.0]), xunit="hz")
 
 
+@pytest.mark.dataset
 def test_convert_roundtrip_reorders_and_keeps_metadata():
-    s = read_spectrum("data/spectra/1/1_CPL.csv")
+    s = read_spectrum(str(DATA / "spectra" / "1" / "1_CPL.csv"))
     ev = s.convert_x("ev")
     assert ev.xunit == "ev" and np.all(np.diff(ev.x) > 0)
     assert ev.y[0] == s.y[-1]
