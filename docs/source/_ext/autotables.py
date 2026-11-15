@@ -54,6 +54,11 @@ def write_solvent_table(release: str) -> None:
 # Further references per system, e.g. corrections, as BibTeX keys of spectralib.bib.
 EXTRA_REFERENCES: dict[str, list[str]] = {
     "5": ["islaCorrectionBis4aza6helicene2019"],
+    "6": ["islaCorrectionBis4aza6helicene2019"],
+    "7": ["islaCorrectionBis4aza6helicene2019"],
+    "8" : ["fujikiCorrectionFujikiQuestions2018"],
+    "9" : ["fujikiCorrectionFujikiQuestions2018"],
+    "46" : ["bossonCorrigendumPhysicochemicalElectronic2019"],
 }
 
 #: Systems whose geometry was simplified relative to the article (footnote ``B``).

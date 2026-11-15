@@ -16,8 +16,7 @@ DOI_REGEX = re.compile(r"^10\.\d{4,9}/[-._;()/:A-Z0-9]+$", re.IGNORECASE)
 
 
 # Accepted ``solv`` header values (lower-cased) -> canonical solvent name. The canonical names are
-# the keys of the Minnesota solvent descriptor database as stored in ``unitkit.constants.solvents``,
-# so all solvent properties are looked up there directly; spectralib only owns the aliases.
+# the keys of the Minnesota solvent descriptor database as stored in ``unitkit.constants.solvents``.
 # Aliases must not contain commas (the header line is comma-separated): "1,4-dioxane" and
 # "n,n-dimethylformamide" are therefore canonical names only, written e.g. as "1-4-dioxane" or "dmf".
 SOLVENT_ALIASES = MappingProxyType(
