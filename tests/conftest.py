@@ -1,9 +1,4 @@
-"""Shared fixtures for the test suite.
-
-The benchmark dataset lives in the repository, not inside the installed
-package, so dataset paths are anchored to the repository root instead of the
-current working directory.
-"""
+"""Shared fixtures for the test suite."""
 
 from pathlib import Path
 

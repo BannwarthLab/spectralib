@@ -58,7 +58,7 @@ def generate_recipe(name: str) -> str:
 
     # Post section
     lines.append("%post")
-    lines.append("    # Update system and install necessary packages")
+    #lines.append("    # Update system and install necessary packages")
     lines.append("    export DEBIAN_FRONTEND=noninteractive")
     lines.append("    export TZ=Europe/Berlin")
     lines.append("    dnf -y update")

@@ -2,7 +2,7 @@
 
 All line shapes are area-normalised and parametrised by their FWHM, in the units of
 the energy grid. Stick energies, grid and FWHM must share one linear energy unit
-('ev' or 'cm-1'); broadening on a wavelength grid is not supported (convert afterwards).
+('ev' or 'cm-1').
 
 """
 

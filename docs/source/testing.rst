@@ -10,7 +10,7 @@ Tests for Data Consistency
 - a missing molecular structure
 - a DOI without an entry in ``spectralib.bib``
 
-Furthermore, there are tests checking for duplicate structures and identifiers (MolBar, InChI) that no longer match the structure provided in a subdirectory.
+Furthermore, there are tests checking for duplicate structures, enantiomers of structures already in the dataset, and identifiers (MolBar, InChI) that no longer match the structure provided in a subdirectory.
 
 .. warning::
   The tests cannot check whether the data matches the referenced article. This has to be checked manually by the maintainer/reviewers of merge requests.
@@ -38,7 +38,7 @@ The dataset tests will check all files stored in ``data/``.
      - Every solvent used resolves to a dielectric constant and refractive index of the Minnesota Solvent Descriptor
        Database (data provided in ``tcgm-unitkit``).
    * - ``test_structures.py``
-     - Every ``.xyz`` file is parsable: atom count derived from all atoms matches the number of atoms declared in the first line, valid element symbols, no NaN/inf coordinates. File names match ``<id>[labels].xyz``. No duplicate structures (same composition and RMSD < 0.1 Å).
+     - Every ``.xyz`` file is parsable: atom count derived from all atoms matches the number of atoms declared in the first line, valid element symbols, no NaN/inf coordinates. File names match ``<id>[labels].xyz``. No duplicate structures (same composition and RMSD < 0.1 Å). No two structures whose MolBar is identical or show a mirrored chirality spectrum (duplicates or enantiomers).
    * - ``test_consistency.py``
      - The DOI of every spectrum file has an entry in ``spectralib.bib``, spectra and structures have the same system folders (``<id>/``), spectrum file names follow ``<id>[labels]_<LUM|CPL>[_<int>].csv``, every molecule of a spectrum has an ``.xyz`` file and every ``.xyz`` file belongs to a spectrum.
    * - ``test_fingerprints.py``

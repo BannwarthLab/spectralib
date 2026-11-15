@@ -1,4 +1,4 @@
-"""spectralib: tools for the luminescence/CPL reference dataset and for comparing calculated with experimental spectra."""
+"""spectralib: tools for working with the luminescence/CPL reference dataset and for comparing calculated with experimental spectra."""
 
 from importlib.metadata import PackageNotFoundError, version
 

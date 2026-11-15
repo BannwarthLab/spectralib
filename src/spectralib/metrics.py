@@ -1,18 +1,4 @@
-"""Comparison metrics between a reference (usually experimental) and a calculated spectrum.
-
-Both spectra must be on an energy axis in eV (shifts are in eV). Experimental .csv
-files are in nm: use ``spec.convert_x("ev", jacobian=True)`` for LUM/CPL intensities.
-
-Grid / window
-    Both spectra are linearly interpolated on a uniform grid. ``window="ref"`` (default)
-    restricts the comparison to the measured range of the reference: outside it the
-    experiment is unknown, not zero. ``window="union"`` integrates over both ranges
-    (theory vs. theory).
-Shift convention
-    ``shift`` is added to the calculated energies: calc(E - shift) is compared to ref(E).
-
-Recommended protocol for signed spectra (CPL/ECD): see ``benchmark``.
-"""
+"""Comparison metrics between a reference (usually experimental) and a calculated spectrum."""
 
 from __future__ import annotations
 
