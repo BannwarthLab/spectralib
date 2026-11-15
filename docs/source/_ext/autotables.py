@@ -62,7 +62,7 @@ EXTRA_REFERENCES: dict[str, list[str]] = {
 }
 
 #: Systems whose geometry was simplified relative to the article (footnote ``B``).
-TRUNCATED: set[str] = {"22", "25"}
+TRUNCATED: set[str] = {"19", "21", "22", "23", "25", "36", "37", "47"}
 
 
 _RST_SPECIAL = str.maketrans({c: "\\" + c for c in "\\*`|_@"})
