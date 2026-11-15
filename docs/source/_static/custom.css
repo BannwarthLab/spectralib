@@ -24,3 +24,66 @@
 /* .wy-nav-content { */
     /* max-width: 100% !important; */
 /* } */
+
+/* ---- spectralib colours, taken from the logo ---------------------------------------- */
+:root {
+    --sl-navy: #00185b;   /* "spectra" lettering */
+    --sl-blue: #0e5f9b;   /* database */
+    --sl-cyan: #0aa1ca;   /* "lib" lettering */
+    --sl-light: #d6dde7;  /* outer ring */
+}
+
+/* Logo on white at the top of the sidebar, not wider than the logo needs */
+.wy-side-nav-search img.logo {
+    max-width: 170px !important;
+    margin: 0.2em auto 0.6em auto;
+}
+.wy-side-nav-search input[type="text"] {
+    border-color: var(--sl-light);
+}
+
+/* Sidebar and mobile top bar in the navy of the logo */
+.wy-nav-side,
+.wy-nav-top {
+    background: var(--sl-navy);
+}
+.wy-menu-vertical p.caption,
+.wy-menu-vertical header {
+    color: var(--sl-cyan);
+}
+.wy-menu-vertical a:hover {
+    background-color: #0b2a72;
+}
+
+/* Headings, links and inline code */
+.rst-content h1,
+.rst-content h2,
+.rst-content h3 {
+    color: var(--sl-navy);
+}
+.rst-content a,
+.rst-content a:visited {
+    color: var(--sl-blue);
+}
+.rst-content a:hover {
+    color: var(--sl-cyan);
+}
+.rst-content code.literal {
+    color: var(--sl-navy);
+}
+
+/* Table headers in the light grey-blue of the logo ring */
+.rst-content table.docutils thead th {
+    background: var(--sl-light);
+}
+
+/* Justified body text with hyphenation (uses the page language, English by default in Sphinx).
+   Only running text: table cells, code and the sidebar stay left-aligned. */
+.rst-content section > p,
+.rst-content section > ul li > p,
+.rst-content section > ol li > p,
+.rst-content .admonition > p {
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+}

@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this dataset or spectralib, please cite it as below."
+type: dataset
+title: "spectralib: A Dataset for Luminescence and Circularly Polarized Luminescence Spectra"
+authors:
+  - family-names: Pauls
+    given-names: Mike
+    orcid: "https://orcid.org/0009-0004-3962-9639"
+    affiliation: "Institute of Physical Chemistry, RWTH Aachen University"
+  - family-names: Maser
+    given-names: Nicole
+    orcid: "https://orcid.org/0009-0007-1696-1585"
+    affiliation: "Institute of Physical Chemistry, RWTH Aachen University"
+  - family-names: Feldmann
+    given-names: Gereon
+    orcid: "https://orcid.org/0009-0009-1466-4610"
+    affiliation: "Institute of Physical Chemistry, RWTH Aachen University"
+  - family-names: Bannwarth
+    given-names: Christoph
+    orcid: "https://orcid.org/0000-0003-3242-496X"
+    affiliation: "Institute of Physical Chemistry, RWTH Aachen University"
+version: 1.0.0
+doi: 10.5281/zenodo.24260546
+date-released: 2026-11-15
+license:
+  - CC-BY-4.0
+  - BSD-3-Clause
+repository-code: "https://gitlab.git.nrw/rwth-bannwarthlab/spectralib"
+url: "https://rwth-bannwarthlab.pages.git.nrw/spectralib"
+keywords:
+  - circularly polarized luminescence
+  - luminescence
+  - chiroptical spectroscopy
+  - benchmark dataset
+  - excited states

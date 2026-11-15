@@ -4,16 +4,18 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spectralib"
-version = "0.0.2"
-description = "Analysis Tools for LUM and CPL Dataset."
+version = "1.0.0"
+description = "Analysis Tools for Spectroscopic Data"
 readme = "README.md"
-license = "CC-BY-SA-4.0"
+license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 requires-python = ">=3.12"
 
 authors = [
     {name = "Mike Pauls"},
     {name = "Nicole Maser"},
+    {name = "Gereon Feldmann"},
+    {name = "Christoph Bannwarth"},
 ]
 
 maintainers = [
@@ -23,7 +25,7 @@ maintainers = [
 dependencies = [
     "numpy",
     "scipy",
-    "tcgm-unitkit @ git+https://gitlab.git.nrw/rwth-bannwarthlab/tcgm-unitkit.git@main",
+    "tcgm-unitkit @ git+https://gitlab.git.nrw/rwth-bannwarthlab/tcgm-unitkit.git@v0.1.0",
 ]
 
 classifiers = [
@@ -36,14 +38,19 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
+[project.urls]
+Homepage = "https://gitlab.git.nrw/rwth-bannwarthlab/spectralib"
+Documentation = "https://rwth-bannwarthlab.pages.git.nrw/spectralib"
+Repository = "https://gitlab.git.nrw/rwth-bannwarthlab/spectralib.git"
+Issues = "https://gitlab.git.nrw/rwth-bannwarthlab/spectralib/-/issues"
+
 [project.optional-dependencies]
 plot = [
     "matplotlib",
 ]
 
-# pinned: the MolBar version is part of every barcode, InChI output depends on the Open Babel build.
-# MolBar ships no Windows wheel, so the extra installs without it there and
-# comp_fingerprints is unavailable on Windows.
+# As of Nov 15, 2026 MolBar does not have a Windows wheel, so 
+# comp_fingerprints is unavailable on Windows at the moment.
 fingerprint = [
     "joblib",
     "openbabel==3.2.1",
@@ -64,10 +71,13 @@ docs = [
     "sphinx",
     "sphinx_rtd_theme",
     "sphinxcontrib-bibtex",
+    "myst-parser",
+    "matplotlib", 
 ]
 
 [project.scripts]
 comp_fingerprints = "spectralib.scripts.compute_fingerprints:main"
+summarize_spectra = "spectralib.scripts.summarize_spectra:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -76,7 +86,8 @@ include = ["spectralib*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
-    "dataset: requires the benchmark dataset in data/, i.e. a repository checkout",
+    "dataset: validates the format and consistency of the data in data/",
+    "library: tests the code of spectralib (set automatically for every test without the dataset marker)",
 ]
 
 [tool.mypy]

@@ -1,5 +1,5 @@
 # =============================================================================
-# test_structures.py  –  XYZ structure files + RMSD duplicate detection
+# test_structures.py  –  XYZ structure files, duplicates and enantiomers
 # =============================================================================
 import itertools
 import re
@@ -75,12 +75,7 @@ def test_structure_filenames_match_convention(all_structures):
 
 def test_no_duplicate_structures(all_structures):
     """No two structures with the same atom count and element composition
-    should be near-identical (Kabsch RMSD < threshold).
-
-    Note: enantiomers will superimpose under Kabsch (which corrects for
-    reflections via the determinant sign). If your dataset intentionally
-    contains enantiomeric pairs, exclude them here by stem label.
-    """
+    should be near-identical (Kabsch RMSD < threshold)."""
     from collections import defaultdict
 
     by_size: dict[int, list] = defaultdict(list)
@@ -101,4 +96,58 @@ def test_no_duplicate_structures(all_structures):
     assert not duplicates, (
         f"{len(duplicates)} duplicate pair(s) found "
         f"(threshold {RMSD_DUPLICATE_THRESHOLD} Å):\n" + "\n".join(duplicates)
+    )
+
+
+# ---------------------------------------------------------------------------
+# Duplicates and enantiomers from the MolBar identifiers
+# ---------------------------------------------------------------------------
+ALLOWED_STEREOISOMER_PAIRS: set[frozenset[str]] = set()
+
+
+def _molbar_parts(barcode: str) -> tuple[tuple[str, ...], tuple[int, ...]]:
+    """(sections without name and version, chirality spectrum) of a MolBar."""
+    sections = [s.strip() for s in barcode.strip().split("|")]
+    return tuple(sections[2:-1]), tuple(int(v) for v in sections[-1].split())
+
+
+def _mirror(chirality: tuple[int, ...]) -> tuple[int, ...]:
+    return tuple(sorted(-v for v in chirality))
+
+
+def _stereo_relation(barcode1: str, barcode2: str) -> str | None:
+    """'identical', 'enantiomers' or None (different molecules or diastereomers)."""
+    (rest1, chir1), (rest2, chir2) = _molbar_parts(barcode1), _molbar_parts(barcode2)
+    if rest1 != rest2:
+        return None
+    if chir1 == chir2:
+        return "identical"
+    if chir2 == _mirror(chir1):
+        return "enantiomers"
+    return None
+
+
+def test_stereo_relation_rules():
+    base = "MolBar | 1.2.0 | C2H2 | 0 | 1 | 1 2 | 3 | 4 5 | "
+    assert _stereo_relation(base + "-4 0 14", base + "-4 0 14") == "identical"
+    assert _stereo_relation(base + "-4 0 14", base + "-14 0 4") == "enantiomers"
+    assert _stereo_relation(base + "-4 0 14", base + "-4 0 15") is None
+    assert _stereo_relation(base + "0 0", base + "0 0") == "identical"
+    assert _stereo_relation(base + "-10", base.replace("4 5", "4 6") + "10") is None
+
+
+def test_no_duplicate_or_enantiomer_molbar():
+    """No two structures may have the same MolBar or mirror-image MolBars."""
+    files = sorted((DATA / "structures").rglob("*.molbar"))
+    assert files, "No .molbar files found"
+    barcodes = {f.stem: f.read_text() for f in files}
+    found = []
+    for a, b in itertools.combinations(barcodes, 2):
+        relation = _stereo_relation(barcodes[a], barcodes[b])
+        if relation and frozenset((a, b)) not in ALLOWED_STEREOISOMER_PAIRS:
+            found.append(f"  {a} and {b}: {relation}")
+    assert not found, (
+        "Structures that are duplicates or enantiomers of each other (MolBar):\n"
+        + "\n".join(found)
+        + "\nEach system should be stored once, with the enantiomer measured in the article."
     )

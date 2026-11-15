@@ -2,19 +2,17 @@
 # test_plotting.py  –  smoke test (headless)
 # =============================================================================
 import numpy as np
-import pytest
 from conftest import DATA
 
 from spectralib import read_spectrum
-from spectralib.broadening import emission_spectrum
+from spectralib.broadening import spectrum
 from spectralib.plotting import add_wavelength_axis, plot_comparison, plot_sticks
 
 
-@pytest.mark.dataset
 def test_comparison_plot(tmp_path):
     ref = read_spectrum(str(DATA / "spectra" / "12" / "12_CPL.csv")).convert_x("ev", jacobian=True)
     grid = np.linspace(1.5, 5.0, 1000)
-    calc = emission_spectrum([3.1], [-4.0], grid, 0.35)
+    calc = spectrum([3.1], [-4.0], grid, 0.35)
     ax = plot_comparison(ref, calc, shift=-0.2)
     plot_sticks([2.9], [-1.0], ax)
     add_wavelength_axis(ax)
