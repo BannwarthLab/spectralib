@@ -2,7 +2,8 @@
 
 For every <stem>.xyz found, <stem>.molbar and <stem>.inchi are written next to it.
 Total charge and unpaired electrons are read from xtb-style .CHRG / .UHF files in the
-same folder (default 0 / 0). A descriptor file is only (over)written if its computation succeeded.
+same folder (default 0 / 0) and passed to MolBar; the InChI (Open Babel) is generated from the
+xyz geometry alone. A descriptor file is only (over)written if its computation succeeded.
 """
 
 from __future__ import annotations

@@ -1,11 +1,5 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# For the full list of built-in configuration values, see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
-
 from __future__ import annotations
 
-import os
 import sys
 import tomllib
 from pathlib import Path
@@ -14,11 +8,9 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 
 sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(HERE / "_ext"))  # local extensions for automated documentation based on repo content
 
-# -- Project information -----------------------------------------------------
-# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
-# Authors and version are taken from pyproject.toml, so they are maintained in one place.
-
+# Authors and version taken from pyproject.toml
 with open(ROOT / "pyproject.toml", "rb") as f:
     _meta = tomllib.load(f)["project"]
 
@@ -33,33 +25,8 @@ def skip(app, what, name, obj, would_skip, options):
     return would_skip
 
 
-def write_solvent_table() -> None:
-    """Render the accepted solvents (``spectralib.utils``) as an rST table for ``dataset.rst``."""
-    from spectralib.utils import DIELECTRIC_CONSTANTS, SOLVENT_ALIASES
-
-    rows = [
-        "   * - ``{}``\n     - {}\n     - {}".format(alias, name, DIELECTRIC_CONSTANTS.get(name, "-"))
-        for alias, name in sorted(SOLVENT_ALIASES.items(), key=lambda kv: (kv[1], kv[0]))
-    ]
-    table = [
-        ".. list-table::",
-        "   :header-rows: 1",
-        "   :widths: 25 45 30",
-        "",
-        "   * - ``solv``",
-        "     - Solvent",
-        "     - Dielectric constant",
-        *rows,
-        "",
-    ]
-    out = HERE / "_generated" / "solvents.inc"
-    out.parent.mkdir(exist_ok=True)
-    out.write_text("\n".join(table), encoding="utf-8")
-
-
 def setup(app):
     app.connect("autodoc-skip-member", skip)
-    write_solvent_table()
 
 
 autodoc_default_options = {
@@ -70,8 +37,6 @@ autodoc_default_options = {
     "exclude-members": "__weakref__",
 }
 
-
-# -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
@@ -83,35 +48,37 @@ extensions = [
     "sphinx.ext.autosectionlabel",
     "sphinx_rtd_theme",
     "sphinxcontrib.bibtex",
+    "myst_parser",  # CHANGELOG.md in changelog.rst
+    "autotables",
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "special.rst"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 autosummary_generate = True
 
 bibtex_bibfiles = ["lit.bib", "spectralib.bib"]
 bibtex_default_style = "unsrt"
 
-# Render "Attributes:" sections as :ivar: fields of the class instead of separate
-# `.. attribute::` objects. Without this, every attribute described in a class docstring is
-# also documented by autodoc itself (undoc-members is on), which Sphinx reports as a duplicate
-# object description.
 napoleon_use_ivar = True
-
-# Prefix autosectionlabel targets with their document name, so that identically named sections
-# in different files (e.g. an "Installation" heading in two pages) do not collide.
 autosectionlabel_prefix_document = True
 
-# -- Options for HTML output -------------------------------------------------
+# Fmt html
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
-html_css_files = ["hack.css", "custom.css"]
-
-with open(os.path.join(os.path.dirname(__file__), "special.rst"), encoding="utf-8") as special_file:
-    rst_prolog = "\n" + special_file.read() + "\n"
+html_css_files = ["custom.css"]
+html_logo = "../../imgs/spectralib_logo.svg"
+html_favicon = "_static/favicon.png"
+html_title = f"spectralib {release}"
+html_theme_options = {
+    "logo_only": True,
+    "style_nav_header_background": "#ffffff",
+    "collapse_navigation": False,
+    "navigation_depth": 3,
+}
+html_show_sourcelink = False
 
 latex_elements = {
     "preamble": r"""

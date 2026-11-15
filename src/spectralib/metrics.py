@@ -7,7 +7,7 @@ Grid / window
     Both spectra are linearly interpolated on a uniform grid. ``window="ref"`` (default)
     restricts the comparison to the measured range of the reference: outside it the
     experiment is unknown, not zero. ``window="union"`` integrates over both ranges
-    (theory vs. theory, as in E_spe of Zhou & Parker).
+    (theory vs. theory).
 Shift convention
     ``shift`` is added to the calculated energies: calc(E - shift) is compared to ref(E).
 
@@ -19,7 +19,6 @@ from __future__ import annotations
 import numpy as np
 import numpy.typing as npt
 from scipy.integrate import trapezoid
-from scipy.optimize import linear_sum_assignment
 
 from spectralib.broadening import gaussian
 from spectralib.spectrum import Spectrum
@@ -77,18 +76,6 @@ def _lobes(x: np.ndarray, a: np.ndarray, b: np.ndarray) -> tuple[np.ndarray, np.
     return out[0], out[1]
 
 
-def _espe(x: np.ndarray, a: np.ndarray, b: np.ndarray, norm: str | None) -> np.ndarray:
-    if norm == "area":
-        a = a / trapezoid(np.abs(a), x)
-        b = b / trapezoid(np.abs(b), x, axis=-1)[..., None]
-    elif norm == "max":
-        a = a / np.abs(a).max()
-        b = b / np.abs(b).max(axis=-1)[..., None]
-    elif norm is not None:
-        raise ValueError("norm must be 'area', 'max' or None")
-    return trapezoid(np.abs(a - b), x, axis=-1) / trapezoid(np.abs(a), x)
-
-
 def _objective(x: np.ndarray, a: np.ndarray, b: np.ndarray, kind: str) -> np.ndarray:
     if kind == "cosine":
         return _cos(x, a, b)
@@ -96,9 +83,7 @@ def _objective(x: np.ndarray, a: np.ndarray, b: np.ndarray, kind: str) -> np.nda
         return _cos(x, np.abs(a), np.abs(b))
     if kind == "lobes":
         return np.nanmean(np.vstack(_lobes(x, a, b)), axis=0)
-    if kind == "e_spe":
-        return -_espe(x, a, b, "area")
-    raise ValueError("objective must be 'cosine', 'abs_cosine', 'lobes' or 'e_spe'")
+    raise ValueError("objective must be 'cosine', 'abs_cosine' or 'lobes'")
 
 
 # ----------------------------------------------------------------------------- shape metrics
@@ -122,27 +107,6 @@ def lobe_cosines(
     return float(o_pos), float(o_neg)
 
 
-def e_spe(
-    ref: Spectrum,
-    calc: Spectrum,
-    shift: float = 0.0,
-    norm: str | None = "area",
-    n: int = _N,
-    window: str = "ref",
-) -> float:
-    r"""Spectral error :math:`E_\mathrm{spe} = \int|y^\mathrm{ref}-y^\mathrm{calc}| / \int|y^\mathrm{ref}|`.
-
-    Zhou & Parker, JPCL 2023, Eq. 12.
-
-    The paper compares spectra in the same absolute units (``norm=None``). Against experiment
-    (arbitrary units) both are normalised first; with ``norm='area'`` (:math:`\int|y| = 1`):
-    0 = identical, 2 = no overlap or exact sign inversion. :math:`|y^\mathrm{ref}|` in the
-    denominator makes it defined for signed spectra.
-    """
-    x, a, b = _sample(ref, calc, shift, n, window)
-    return float(_espe(x, a, b[0], norm))
-
-
 def optimal_shift(
     ref: Spectrum,
     calc: Spectrum,
@@ -155,10 +119,10 @@ def optimal_shift(
     """Shift of calc maximising ``objective`` by grid search + parabolic refinement.
 
     objective: 'cosine' (unsigned spectra), 'abs_cosine' (sign-agnostic alignment of signed
-    spectra), 'lobes' (mean of applicable lobe cosines), 'e_spe' (minimise area-normalised E_spe).
+    spectra), 'lobes' (mean of applicable lobe cosines).
 
     Returns:
-        (shift, objective value at the grid optimum; -E_spe for 'e_spe').
+        (shift, objective value at the grid optimum).
     """
     shifts = np.arange(bounds[0], bounds[1] + 0.5 * step, step)
     x, a, b = _sample(ref, calc, shifts, n, window)
@@ -184,7 +148,7 @@ def lobe_areas(spec: Spectrum) -> tuple[float, float]:
 
 
 def sign_ratio(spec: Spectrum) -> float:
-    """(A+ - A-) / (A+ + A-) in [-1, 1]: +-1 monosignate, ~0 balanced couplet (sign ill-defined)."""
+    """(A+ - A-) / (A+ + A-) in [-1, 1]: +-1 for a single sign, ~0 if positive and negative lobes have similar areas (sign ill-defined)."""
     p, m = lobe_areas(spec)
     return (p - m) / (p + m) if p + m > 0 else 0.0
 
@@ -213,25 +177,6 @@ def peak_energy(spec: Spectrum, smooth_fwhm: float | None = None) -> float:
     return float(s.x[np.argmax(dominant_sign(s) * s.y)])
 
 
-def e_ene(ref_energies: np.ndarray, calc_energies: np.ndarray, match: bool = False) -> float:
-    r"""RMSD of excitation energies, E_ene (Zhou & Parker, JPCL 2023, Eq. 11).
-
-    Args:
-        ref_energies, calc_energies: Paired energies (state i <-> i, or molecule i <-> i
-            for band maxima across a dataset).
-        match: Re-pair states by minimal total :math:`|\Delta E|` (Hungarian assignment) to handle
-            root flipping; the paper uses eigenvector overlaps, which are not available here.
-    """
-    r = np.asarray(ref_energies, dtype=float)
-    c = np.asarray(calc_energies, dtype=float)
-    if match:
-        rows, cols = linear_sum_assignment(np.abs(r[:, None] - c[None, :]))
-        r, c = r[rows], c[cols]
-    elif r.shape != c.shape:
-        raise ValueError("Unequal lengths; pass match=True to assign states.")
-    return float(np.sqrt(np.mean((r - c) ** 2)))
-
-
 # ----------------------------------------------------------------------------- summary
 
 
@@ -255,7 +200,7 @@ def benchmark(
          corresponding LUM/UV-vis pair, since both come from the same transitions), or it is
          optimised here - on :math:`|y|` for signed spectra, so the alignment cannot trade an energy
          error against a sign error.
-      3. At that shift: signed cosine, lobe cosines (signed only), area-normalised E_spe.
+      3. At that shift: signed cosine, lobe cosines (signed only).
       4. Signed: dominant-sign match (calc evaluated inside the window after the shift) plus
          sign ratios (a ref sign ratio near 0 means the main band sign is not well defined and
          the match should be read with care).
@@ -268,7 +213,6 @@ def benchmark(
         shift, _ = optimal_shift(ref, calc, bounds, objective="abs_cosine" if signed else "cosine", n=n, window=window)
     out["shift"] = float(shift)
     out["cosine"] = cosine(ref, calc, shift, n, window)
-    out["e_spe"] = e_spe(ref, calc, shift, "area", n, window)
     if signed:
         out["o_pos"], out["o_neg"] = lobe_cosines(ref, calc, shift, n, window)
         in_window = calc.shift_x(shift).crop(ref.x[0], ref.x[-1])

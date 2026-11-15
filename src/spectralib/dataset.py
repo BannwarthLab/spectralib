@@ -44,7 +44,7 @@ def load_dataset_metadata(
 
     Args:
         spectra_dir:
-            Root directory containing CSV spectra.
+            Root directory containing CSV spectra (searched recursively), or a single CSV file.
 
         select:
             Optional list of molecule IDs to include.
@@ -55,10 +55,8 @@ def load_dataset_metadata(
 
     spectra_path = Path(spectra_dir)
 
-    files = sorted(
-        spectra_path.rglob("*.csv"),
-        key=_sort_key,
-    )
+    # a single file, or all spectra below a directory
+    files = [spectra_path] if spectra_path.is_file() else sorted(spectra_path.rglob("*.csv"), key=_sort_key)
 
     if select is not None:
         select_set = set(select)

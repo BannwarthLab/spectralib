@@ -19,7 +19,6 @@ def test_validation():
         Spectrum(np.array([1.0, 2.0]), np.array([1.0, 1.0]), xunit="hz")
 
 
-@pytest.mark.dataset
 def test_convert_roundtrip_reorders_and_keeps_metadata():
     s = read_spectrum(str(DATA / "spectra" / "1" / "1_CPL.csv"))
     ev = s.convert_x("ev")

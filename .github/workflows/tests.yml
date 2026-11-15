@@ -103,4 +103,4 @@ jobs:
           pip install --force-reinstall dist/*.whl
           python -c "import spectralib; print(spectralib.__version__ if hasattr(spectralib, '__version__') else 'ok')"
       - name: Library tests against the installed package
-        run: pytest tests -v -m "not dataset"
+        run: pytest tests -v -m library
