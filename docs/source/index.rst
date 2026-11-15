@@ -34,7 +34,7 @@ Further notes:
    * - Extendability
      - The data format is checked in the CI/CD pipeline (see :doc:`testing`) to identify formal errors automatically. This simplifies the contributing process and maintenance.
    * - Versioning
-     - The git history tracks all changes made in the repository, and every release (current version: |release|) is tagged in git. If you use data from this repository, you can simply cite the tagged version you used (see :doc:`citation`).
+     - The git history tracks all changes made in the repository, and every release (current version: |release|) is tagged in git. Every release of the dataset is archived on Zenodo (DOI: |dataset_doi|). If you use data from this repository, cite the version you used (see :doc:`citation`).
    * - Licensing
      - The data is licensed under CC BY 4.0, the code under BSD-3-Clause (see :ref:`license`).
 

@@ -11,6 +11,7 @@
   <img src="https://img.shields.io/badge/python-3.12%20%7C%203.13%20%7C%203.14-blue" alt="Python versions">
   <a href="LICENSE"><img src="https://img.shields.io/badge/code-BSD--3--Clause-blue" alt="Code license: BSD-3-Clause"></a>
   <a href="data/LICENSE"><img src="https://img.shields.io/badge/data-CC%20BY%204.0-lightgrey" alt="Data license: CC BY 4.0"></a>
+  <a href="https://doi.org/10.5281/zenodo.24260546"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.24260546.svg" alt="Dataset DOI"></a>
 </p>
 
 ---
@@ -79,7 +80,7 @@ New data from **you** to this repository is welcome! Just add your files to `dat
 
 ## 📝 How to Cite
 
-Please cite the corresponding publication (M. Pauls, N. Maser, G. Feldmann, C. Bannwarth, *manuscript in preparation*) and state the dataset version you used. Citation metadata are provided in [`CITATION.cff`](CITATION.cff).
+Please cite the corresponding publication (M. Pauls, N. Maser, G. Feldmann, C. Bannwarth, *manuscript in preparation*) and the dataset archived on Zenodo ([10.5281/zenodo.24260546](https://doi.org/10.5281/zenodo.24260546)), and state the dataset version you used. Citation metadata are provided in [`CITATION.cff`](CITATION.cff).
 
 ---
 

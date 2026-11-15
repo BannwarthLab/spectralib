@@ -9,7 +9,7 @@ Overview of Existing Data
 
    Growth of the ``spectralib`` dataset for different version numbers. Current version: |release|.
 
-The table lists all systems in the dataset together with the article the spectra refer to.
+The table lists all systems in the dataset together with the article the spectra refer to. Unless stated otherwise, the spectra were digitized from the figures of the cited articles.
 
 .. include:: _generated/overview.inc
 

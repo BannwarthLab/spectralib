@@ -18,6 +18,12 @@ project = "spectralib"
 author = ", ".join(a["name"] for a in _meta["authors"])
 version = release = str(_meta["version"])
 
+# Zenodo DOI of the dataset; used as |dataset_doi| in the documentation
+DATASET_DOI = "10.5281/zenodo.24260546"
+rst_epilog = f"""
+.. |dataset_doi| replace:: `{DATASET_DOI} <https://doi.org/{DATASET_DOI}>`__
+"""
+
 
 def skip(app, what, name, obj, would_skip, options):
     if name == "__init__":
